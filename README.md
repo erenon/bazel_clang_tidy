@@ -12,8 +12,8 @@ bazel build //... --aspects clang_tidy/clang_tidy.bzl%clang_tidy_aspect --output
 
 ## Features
 
- - Run clang-tidy on any C++ target and on its dependencies
- - Run clang-tidy without also building the targets
+ - Run clang-tidy on any C++ target
+ - Run clang-tidy without also building the target
  - Use Bazel to cache clang-tidy reports: recompute stale reports only
 
 ## Install
@@ -40,5 +40,5 @@ To see the tool in action:
 
 ## Requirements
 
- - Bazel 2.0 or newer
+ - Bazel 4.0 or newer (might work with older versions)
  - clang-tidy on $PATH. (if not, edit `run_clang_tidy.sh`)
