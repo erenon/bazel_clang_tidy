@@ -1,9 +1,8 @@
-
 filegroup(
-    name = 'clang_tidy_config',
+    name = "clang_tidy_config",
     data = [
-        '.clang-tidy',
+        ".clang-tidy",
         # '//example:clang_tidy_config', # add package specific configs if needed
     ],
-    visibility = ['//visibility:public'],
+    visibility = ["//visibility:public"],
 )
