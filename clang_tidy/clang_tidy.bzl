@@ -45,6 +45,12 @@ def _run_tidy(ctx, exe, flags, compilation_context, infile, discriminator):
         arguments = [args],
         mnemonic = "ClangTidy",
         progress_message = "Run clang-tidy on {}".format(infile.short_path),
+        execution_requirements = {
+            # without "no-sandbox" flag the clang-tidy can not find a .clang-tidy file in the
+            # closest parent, because the .clang-tidy file is placed in a "clang_tidy" shell
+            # script runfiles, which is not a parent directory for any C/C++ source file
+            "no-sandbox": "1",
+        },
     )
     return outfile
 
