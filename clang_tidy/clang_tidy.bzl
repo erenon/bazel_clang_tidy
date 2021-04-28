@@ -1,4 +1,5 @@
 load('@rules_cc//cc:action_names.bzl', 'CPP_COMPILE_ACTION_NAME')
+load('@bazel_tools//tools/cpp:toolchain_utils.bzl', 'find_cpp_toolchain')
 
 def _run_tidy(ctx, exe, flags, compilation_context, infile, discriminator):
     inputs = depset(direct = [infile], transitive = [compilation_context.headers])
@@ -55,7 +56,7 @@ def _rule_sources(ctx):
     return srcs
 
 def _toolchain_flags(ctx):
-    cc_toolchain = ctx.toolchains['@bazel_tools//tools/cpp:toolchain_type']
+    cc_toolchain = find_cpp_toolchain(ctx)
     feature_configuration = cc_common.configure_features(
         ctx = ctx,
         cc_toolchain = cc_toolchain,
@@ -99,7 +100,7 @@ clang_tidy_aspect = aspect(
     implementation = _clang_tidy_aspect_impl,
     fragments = ['cpp'],
     attrs = {
-        '_clang_tidy': attr.label(default = Label('//clangtidy:clang_tidy')),
+        '_cc_toolchain': attr.label(default = Label('@bazel_tools//tools/cpp:current_cc_toolchain')),
+        '_clang_tidy': attr.label(default = Label('//clang_tidy:clang_tidy')),
     },
-    toolchains = ['@bazel_tools//tools/cpp:toolchain_type'],
 )
