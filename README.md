@@ -38,7 +38,7 @@ dependency.
 # //:BUILD
 filegroup(
        name = "clang_tidy_config",
-       data = [".clang_tidy"],
+       data = [".clang-tidy"],
        visibility = ["//visibility:public"],
 )
 ```
