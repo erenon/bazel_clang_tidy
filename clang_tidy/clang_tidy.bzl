@@ -1,4 +1,3 @@
-load("@rules_cc//cc:action_names.bzl", "CPP_COMPILE_ACTION_NAME")
 load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain")
 
 def _run_tidy(ctx, exe, flags, compilation_context, infile, discriminator):
@@ -74,7 +73,7 @@ def _toolchain_flags(ctx):
     )
     flags = cc_common.get_memory_inefficient_command_line(
         feature_configuration = feature_configuration,
-        action_name = CPP_COMPILE_ACTION_NAME,
+        action_name = "c++-compile", # tools/build_defs/cc/action_names.bzl CPP_COMPILE_ACTION_NAME
         variables = compile_variables,
     )
     return flags
