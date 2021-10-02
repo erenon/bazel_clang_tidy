@@ -5,7 +5,7 @@ cc_library(
 )
 
 cc_binary(
-    name = "app",
+    name = "example",
     srcs = ["app.cpp"],
     deps = [":lib"],
 )
