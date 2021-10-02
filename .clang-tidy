@@ -1,9 +1,10 @@
+UseColor: true
 
-Checks: "\
-  bugprone-*,\
-  cppcoreguidelines-*,\
-  google-*,\
-  performance-*"
+Checks: >
+    bugprone-*,
+    cppcoreguidelines-*,
+    google-*,
+    performance-*,
 
 HeaderFilterRegex: ".*"
 
