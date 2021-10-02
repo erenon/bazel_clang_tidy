@@ -6,7 +6,10 @@ def _run_tidy(ctx, exe, flags, compilation_context, infile, discriminator):
     args = ctx.actions.args()
 
     # specify the output file - twice
-    outfile = ctx.actions.declare_file(infile.path + "." + discriminator + ".clang-tidy.yaml")
+    outfile = ctx.actions.declare_file(
+        "bazel_clang_tidy_" + infile.path + "." + discriminator + ".clang-tidy.yaml"
+    )
+
     args.add(outfile.path)  # this is consumed by the wrapper script
     args.add("--export-fixes", outfile.path)
 
