@@ -85,7 +85,12 @@ def _safe_flags(flags):
     # Some flags might be used by GCC, but not understood by Clang.
     # Remove them here, to allow users to run clang-tidy, without having
     # a clang toolchain configured (that would produce a good command line with --compiler clang)
-    return [flag for flag in flags if flag != "-fno-canonical-system-headers" and not flag.startswith("--sysroot")]
+    unsupported_flags = [
+        "-fno-canonical-system-headers",
+        "-fstack-usage",
+    ]
+
+    return [flag for flag in flags if flag not in unsupported_flags and not flag.startswith("--sysroot")]
 
 def _clang_tidy_aspect_impl(target, ctx):
     # if not a C/C++ target, we are not interested
