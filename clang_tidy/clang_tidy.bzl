@@ -61,6 +61,9 @@ def _rule_sources(ctx):
     if hasattr(ctx.rule.attr, "srcs"):
         for src in ctx.rule.attr.srcs:
             srcs += [src for src in src.files.to_list() if src.is_source]
+    if hasattr(ctx.rule.attr, "hdrs"):
+        for hdr in ctx.rule.attr.hdrs:
+            srcs += [hdr for hdr in hdr.files.to_list() if (hdr.is_source and hdr.extension != "h")]
     return srcs
 
 def _toolchain_flags(ctx):
