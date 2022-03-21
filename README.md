@@ -89,7 +89,7 @@ To see the tool in action:
 1.  Clone the repository
 2.  Run clang-tidy:
 
-        bazel build //example:app --aspects clang_tidy/clang_tidy.bzl%clang_tidy_aspect --output_groups=report
+        bazel build //example --aspects clang_tidy/clang_tidy.bzl%clang_tidy_aspect --output_groups=report
 
 3.  Check the error:
 
