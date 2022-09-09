@@ -1,13 +1,13 @@
 load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain")
 
-def _run_tidy(ctx, exe, flags, compilation_context, infile, discriminator):
-    inputs = depset(direct = [infile], transitive = [compilation_context.headers])
+def _run_tidy(ctx, exe, config, flags, compilation_context, infile, discriminator):
+    inputs = depset(direct = [infile, config], transitive = [compilation_context.headers])
 
     args = ctx.actions.args()
 
     # specify the output file - twice
     outfile = ctx.actions.declare_file(
-        "bazel_clang_tidy_" + infile.path + "." + discriminator + ".clang-tidy.yaml"
+        "bazel_clang_tidy_" + infile.path + "." + discriminator + ".clang-tidy.yaml",
     )
 
     args.add(outfile.path)  # this is consumed by the wrapper script
@@ -47,12 +47,6 @@ def _run_tidy(ctx, exe, flags, compilation_context, infile, discriminator):
         arguments = [args],
         mnemonic = "ClangTidy",
         progress_message = "Run clang-tidy on {}".format(infile.short_path),
-        execution_requirements = {
-            # without "no-sandbox" flag the clang-tidy can not find a .clang-tidy file in the
-            # closest parent, because the .clang-tidy file is placed in a "clang_tidy" shell
-            # script runfiles, which is not a parent directory for any C/C++ source file
-            "no-sandbox": "1",
-        },
     )
     return outfile
 
@@ -76,7 +70,7 @@ def _toolchain_flags(ctx):
     )
     flags = cc_common.get_memory_inefficient_command_line(
         feature_configuration = feature_configuration,
-        action_name = "c++-compile", # tools/build_defs/cc/action_names.bzl CPP_COMPILE_ACTION_NAME
+        action_name = "c++-compile",  # tools/build_defs/cc/action_names.bzl CPP_COMPILE_ACTION_NAME
         variables = compile_variables,
     )
     return flags
@@ -98,12 +92,13 @@ def _clang_tidy_aspect_impl(target, ctx):
         return []
 
     exe = ctx.attr._clang_tidy.files_to_run
+    config = ctx.attr._clang_tidy_config.files.to_list()[0]
     toolchain_flags = _toolchain_flags(ctx)
     rule_flags = ctx.rule.attr.copts if hasattr(ctx.rule.attr, "copts") else []
     safe_flags = _safe_flags(toolchain_flags + rule_flags)
     compilation_context = target[CcInfo].compilation_context
     srcs = _rule_sources(ctx)
-    outputs = [_run_tidy(ctx, exe, safe_flags, compilation_context, src, target.label.name) for src in srcs]
+    outputs = [_run_tidy(ctx, exe, config, safe_flags, compilation_context, src, target.label.name) for src in srcs]
 
     return [
         OutputGroupInfo(report = depset(direct = outputs)),
@@ -115,6 +110,7 @@ clang_tidy_aspect = aspect(
     attrs = {
         "_cc_toolchain": attr.label(default = Label("@bazel_tools//tools/cpp:current_cc_toolchain")),
         "_clang_tidy": attr.label(default = Label("//clang_tidy:clang_tidy")),
+        "_clang_tidy_config": attr.label(default = Label("//:clang_tidy_config")),
     },
     toolchains = ["@bazel_tools//tools/cpp:toolchain_type"],
 )
