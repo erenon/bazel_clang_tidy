@@ -1,6 +1,6 @@
-set -ue
-
+#! /bin/bash
 # Usage: run_clang_tidy <OUTPUT> [ARGS...]
+set -ue
 
 OUTPUT=$1
 shift
