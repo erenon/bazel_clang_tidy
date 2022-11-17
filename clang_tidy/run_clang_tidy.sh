@@ -2,6 +2,9 @@
 # Usage: run_clang_tidy <OUTPUT> [ARGS...]
 set -ue
 
+CLANG_TIDY_BIN=$1
+shift
+
 OUTPUT=$1
 shift
 
@@ -11,4 +14,4 @@ shift
 touch $OUTPUT
 truncate -s 0 $OUTPUT
 
-clang-tidy "$@"
+"${CLANG_TIDY_BIN}" "$@"
