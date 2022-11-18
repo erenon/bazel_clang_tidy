@@ -53,6 +53,9 @@ bazel build //... \
   --@bazel_clang_tidy//:clang_tidy_config=//:clang_tidy_config
 ```
 
+:exclamation: the config-file will not be forced by adding it to the clang-tidy command line. Therefore it must be in one of the parents of all source files. It is recommended to put it in the root directly besides the WORKSPACE file.
+
+
 Now if you don't want to type this out every time, it is recommended that you
 add a config in your .bazelrc that matches this command line;
 
@@ -69,6 +72,13 @@ Now from the command line this is a lot nicer to use;
 
 ```sh
 bazel build //... --config clang-tidy
+```
+
+### use a non-system clang-tidy
+by default, bazel_clang_tidy uses the system provided clang-tidy.
+If you have a hermetic build, you can use your own clang-tidy target like this:
+```
+build:clang-tidy --@bazel_clang_tidy//:clang_tidy_executable=@local_config_cc//:clangtidy_bin
 ```
 
 ## Features
@@ -102,4 +112,3 @@ To see the tool in action:
 ## Requirements
 
 - Bazel 4.0 or newer (might work with older versions)
-- clang-tidy on $PATH. (if not, edit `run_clang_tidy.sh`)
