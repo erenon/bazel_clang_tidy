@@ -12,7 +12,7 @@ def _run_tidy(ctx, wrapper, exe, additional_deps, config, flags, compilation_con
 
     # this is consumed by the wrapper script
     if len(exe.files.to_list()) == 0:
-        args.add("clang-tidy")  
+        args.add("clang-tidy")
     else:
         args.add(exe.files_to_run.executable)
 
