@@ -81,6 +81,20 @@ If you have a hermetic build, you can use your own clang-tidy target like this:
 build:clang-tidy --@bazel_clang_tidy//:clang_tidy_executable=@local_config_cc//:clangtidy_bin
 ```
 
+### applying tidy fixes
+
+clang-tidy fixes can be applied with
+
+```sh
+bazel run @bazel_clang_tidy//:apply-fixes
+```
+
+As with running clang-tidy, the binary target and config file can be specified with
+`--@bazel_clang_tidy//:clang_tidy_executable` and
+`--@bazel_clang_tidy//:clang_tidy_config`. Similarly, clang-apply-replacements
+can be specified with
+`--@bazel_clang_tidy//:clang_apply_replacements_executable`.
+
 ## Features
 
 - Run clang-tidy on any C++ target

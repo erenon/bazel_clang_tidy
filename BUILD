@@ -1,3 +1,5 @@
+load("//:defs.bzl", "clang_tidy_apply_fixes")
+
 filegroup(
     name = "clang_tidy_config_default",
     srcs = [
@@ -24,6 +26,17 @@ label_flag(
 )
 
 filegroup(
+    name = "clang_apply_replacements_executable_default",
+    srcs = [],  # empty list: system clang-apply-replacements
+)
+
+label_flag(
+    name = "clang_apply_replacements_executable",
+    build_setting_default = ":clang_apply_replacements_executable_default",
+    visibility = ["//visibility:public"],
+)
+
+filegroup(
     name = "clang_tidy_additional_deps_default",
     srcs = [],
 )
@@ -32,4 +45,8 @@ label_flag(
     name = "clang_tidy_additional_deps",
     build_setting_default = ":clang_tidy_additional_deps_default",
     visibility = ["//visibility:public"],
+)
+
+clang_tidy_apply_fixes(
+    name = "apply-fixes",
 )
