@@ -1,7 +1,23 @@
 load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain")
 
-def _run_tidy(ctx, wrapper, exe, additional_deps, config, flags, compilation_context, infile, discriminator):
-    inputs = depset(direct = [infile, config] + additional_deps.files.to_list() + ([exe.files_to_run.executable] if exe.files_to_run.executable else []), transitive = [compilation_context.headers])
+def _run_tidy(
+        ctx,
+        wrapper,
+        exe,
+        additional_deps,
+        config,
+        flags,
+        compilation_context,
+        infile,
+        discriminator):
+    inputs = depset(
+        direct = (
+            [infile, config] +
+            additional_deps.files.to_list() +
+            ([exe.files_to_run.executable] if exe.files_to_run.executable else [])
+        ),
+        transitive = [compilation_context.headers],
+    )
 
     args = ctx.actions.args()
 
@@ -12,11 +28,14 @@ def _run_tidy(ctx, wrapper, exe, additional_deps, config, flags, compilation_con
 
     # this is consumed by the wrapper script
     if len(exe.files.to_list()) == 0:
-        args.add("clang-tidy")  
+        args.add("clang-tidy")
     else:
         args.add(exe.files_to_run.executable)
 
     args.add(outfile.path)  # this is consumed by the wrapper script
+
+    args.add(config.path)
+
     args.add("--export-fixes", outfile.path)
 
     # add source to check
