@@ -12,10 +12,9 @@ label_flag(
     visibility = ["//visibility:public"],
 )
 
-
 filegroup(
     name = "clang_tidy_executable_default",
-    srcs = [], # empty list: system clang-tidy
+    srcs = [],  # empty list: system clang-tidy
 )
 
 label_flag(
@@ -23,7 +22,6 @@ label_flag(
     build_setting_default = ":clang_tidy_executable_default",
     visibility = ["//visibility:public"],
 )
-
 
 filegroup(
     name = "clang_tidy_additional_deps_default",
