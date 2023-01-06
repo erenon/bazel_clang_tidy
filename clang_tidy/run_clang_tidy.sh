@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Usage: run_clang_tidy <OUTPUT> [ARGS...]
+# Usage: run_clang_tidy <OUTPUT> <CONFIG> [ARGS...]
 set -ue
 
 CLANG_TIDY_BIN=$1
