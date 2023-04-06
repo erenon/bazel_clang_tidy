@@ -1,3 +1,4 @@
+load("@bazel_tools//tools/build_defs/cc:action_names.bzl", "ACTION_NAMES")
 load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain")
 
 def _run_tidy(
@@ -83,7 +84,7 @@ def _rule_sources(ctx):
             srcs += [src for src in src.files.to_list() if src.is_source]
     return srcs
 
-def _toolchain_flags(ctx):
+def _toolchain_flags(ctx, action_name = ACTION_NAMES.cpp_compile):
     cc_toolchain = find_cpp_toolchain(ctx)
     feature_configuration = cc_common.configure_features(
         ctx = ctx,
@@ -96,7 +97,7 @@ def _toolchain_flags(ctx):
     )
     flags = cc_common.get_memory_inefficient_command_line(
         feature_configuration = feature_configuration,
-        action_name = "c++-compile",  # tools/build_defs/cc/action_names.bzl CPP_COMPILE_ACTION_NAME
+        action_name = action_name,
         variables = compile_variables,
     )
     return flags
@@ -121,12 +122,30 @@ def _clang_tidy_aspect_impl(target, ctx):
     exe = ctx.attr._clang_tidy_executable
     additional_deps = ctx.attr._clang_tidy_additional_deps
     config = ctx.attr._clang_tidy_config.files.to_list()[0]
-    toolchain_flags = _toolchain_flags(ctx)
-    rule_flags = ctx.rule.attr.copts if hasattr(ctx.rule.attr, "copts") else []
-    safe_flags = _safe_flags(toolchain_flags + rule_flags)
     compilation_context = target[CcInfo].compilation_context
+
+    rule_flags = ctx.rule.attr.copts if hasattr(ctx.rule.attr, "copts") else []
+    safe_flags = {
+        ACTION_NAMES.cpp_compile: _safe_flags(_toolchain_flags(ctx, ACTION_NAMES.cpp_compile) + rule_flags),
+        ACTION_NAMES.c_compile: _safe_flags(_toolchain_flags(ctx, ACTION_NAMES.c_compile) + rule_flags),
+    }
+
     srcs = _rule_sources(ctx)
-    outputs = [_run_tidy(ctx, wrapper, exe, additional_deps, config, safe_flags, compilation_context, src, target.label.name) for src in srcs]
+
+    outputs = [
+        _run_tidy(
+            ctx,
+            wrapper,
+            exe,
+            additional_deps,
+            config,
+            safe_flags[ACTION_NAMES.c_compile if src.extension == "c" else ACTION_NAMES.cpp_compile],
+            compilation_context,
+            src,
+            target.label.name,
+        )
+        for src in srcs
+    ]
 
     return [
         OutputGroupInfo(report = depset(direct = outputs)),
