@@ -4,6 +4,12 @@ cc_library(
     hdrs = ["lib.hpp"],
 )
 
+cc_library(
+    name = "lib2",
+    srcs = ["lib.c"],
+    hdrs = ["lib.h"],
+)
+
 cc_binary(
     name = "example",
     srcs = ["app.cpp"],
