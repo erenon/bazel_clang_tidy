@@ -4,3 +4,9 @@ sh_binary(
     data = ["//:clang_tidy_config"],
     visibility = ["//visibility:public"],
 )
+
+filegroup(
+    name = "apply_fixes_template",
+    srcs = ["apply_fixes.template.sh"],
+    visibility = ["//visibility:public"],
+)
