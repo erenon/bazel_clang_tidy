@@ -81,6 +81,9 @@ If you have a hermetic build, you can use your own clang-tidy target like this:
 build:clang-tidy --@bazel_clang_tidy//:clang_tidy_executable=@local_config_cc//:clangtidy_bin
 ```
 
+This aspect is not executed on external targets. To exclude other targets,
+users may tag a target with `no-clang-tidy` or `noclangtidy`.
+
 ## Features
 
 - Run clang-tidy on any C++ target

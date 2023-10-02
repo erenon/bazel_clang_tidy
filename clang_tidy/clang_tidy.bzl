@@ -134,6 +134,16 @@ def _clang_tidy_aspect_impl(target, ctx):
     if target.label.workspace_root.startswith("external"):
         return []
 
+    # Targets with specific tags will not be formatted
+    ignore_tags = [
+        "noclangtidy",
+        "no-clang-tidy",
+    ]
+
+    for tag in ignore_tags:
+        if tag in ctx.rule.attr.tags:
+            return []
+
     wrapper = ctx.attr._clang_tidy_wrapper.files_to_run
     exe = ctx.attr._clang_tidy_executable
     additional_deps = ctx.attr._clang_tidy_additional_deps
