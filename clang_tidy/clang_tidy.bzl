@@ -82,6 +82,13 @@ def _rule_sources(ctx):
         """
         Returns True if the file type matches one of the permitted srcs file types for C and C++ header/source files.
         """
+        print(src)
+        ignore_file_types = [
+            ".pb.h",
+        ]
+        for file_type in ignore_file_types:
+            if src.basename.endswith(file_type):
+                return False
         permitted_file_types = [
             ".c", ".cc", ".cpp", ".cxx", ".c++", ".C", ".h", ".hh", ".hpp", ".hxx", ".inc", ".inl", ".H",
         ]
