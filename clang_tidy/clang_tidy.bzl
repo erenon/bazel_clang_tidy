@@ -123,7 +123,7 @@ def _safe_flags(flags):
         "-fstack-usage",
     ]
 
-    return [flag for flag in flags if flag not in unsupported_flags and not flag.startswith("--sysroot")]
+    return [flag for flag in flags if flag not in unsupported_flags]
 
 def _clang_tidy_aspect_impl(target, ctx):
     # if not a C/C++ target, we are not interested
