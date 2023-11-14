@@ -151,10 +151,8 @@ def _clang_tidy_aspect_impl(target, ctx):
     compilation_context = target[CcInfo].compilation_context
 
     rule_flags = ctx.rule.attr.copts if hasattr(ctx.rule.attr, "copts") else []
-    safe_flags = {
-        ACTION_NAMES.cpp_compile: _safe_flags(_toolchain_flags(ctx, ACTION_NAMES.cpp_compile) + rule_flags),
-        ACTION_NAMES.c_compile: _safe_flags(_toolchain_flags(ctx, ACTION_NAMES.c_compile) + rule_flags),
-    }
+    c_flags = _safe_flags(_toolchain_flags(ctx, ACTION_NAMES.c_compile) + rule_flags) + ["-xc"]
+    cxx_flags = _safe_flags(_toolchain_flags(ctx, ACTION_NAMES.cpp_compile) + rule_flags) + ["-xc++"]
 
     srcs = _rule_sources(ctx)
 
@@ -165,7 +163,7 @@ def _clang_tidy_aspect_impl(target, ctx):
             exe,
             additional_deps,
             config,
-            safe_flags[ACTION_NAMES.c_compile if src.extension == "c" else ACTION_NAMES.cpp_compile],
+            c_flags if src.extension == "c" else cxx_flags,
             compilation_context,
             src,
             target.label.name,
