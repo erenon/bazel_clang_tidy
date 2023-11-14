@@ -21,4 +21,8 @@ truncate -s 0 $OUTPUT
 # place it in the current directory
 test -e .clang-tidy || ln -s -f $CONFIG .clang-tidy
 
-"${CLANG_TIDY_BIN}" "$@"
+# Print output on failure only
+logfile="$(mktemp)"
+trap 'if (($?)); then cat "$logfile" 1>&2; fi; rm "$logfile"' EXIT
+
+"${CLANG_TIDY_BIN}" "$@" >"$logfile" 2>&1
