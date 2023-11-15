@@ -1,3 +1,5 @@
+load("@bazel_skylib//rules:common_settings.bzl", "bool_flag")
+
 filegroup(
     name = "clang_tidy_config_default",
     srcs = [
@@ -31,5 +33,17 @@ filegroup(
 label_flag(
     name = "clang_tidy_additional_deps",
     build_setting_default = ":clang_tidy_additional_deps_default",
+    visibility = ["//visibility:public"],
+)
+
+bool_flag(
+    name = "clang_tidy_bazel_out_includes_are_system_includes",
+    build_setting_default = False,
+    visibility = ["//visibility:public"],
+)
+
+bool_flag(
+    name = "clang_tidy_virtual_includes_are_system_includes",
+    build_setting_default = False,
     visibility = ["//visibility:public"],
 )
