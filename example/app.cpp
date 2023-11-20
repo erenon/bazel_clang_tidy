@@ -1,5 +1,6 @@
 #include "lib.hpp"
 #include "lib_ignored.hpp"
+#include "example/person.pb.h"
 
 #include <iostream>
 
