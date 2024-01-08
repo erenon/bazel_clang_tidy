@@ -6,6 +6,4 @@ Checks: >
     google-*,
     performance-*,
 
-HeaderFilterRegex: ".*"
-
 WarningsAsErrors: "*"
