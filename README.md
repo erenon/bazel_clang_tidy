@@ -23,7 +23,7 @@ git_repository(
 You can now compile using the default clang tidy configuration provided using
 the following command;
 
-```
+```text
 bazel build //... \
   --aspects @bazel_clang_tidy//clang_tidy:clang_tidy.bzl%clang_tidy_aspect \
   --output_groups=report
@@ -55,11 +55,10 @@ bazel build //... \
 
 :exclamation: the config-file will not be forced by adding it to the clang-tidy command line. Therefore it must be in one of the parents of all source files. It is recommended to put it in the root directly besides the WORKSPACE file.
 
-
 Now if you don't want to type this out every time, it is recommended that you
 add a config in your .bazelrc that matches this command line;
 
-```
+```text
 # Required for bazel_clang_tidy to operate as expected
 build:clang-tidy --aspects @bazel_clang_tidy//clang_tidy:clang_tidy.bzl%clang_tidy_aspect
 build:clang-tidy --output_groups=report
@@ -75,9 +74,11 @@ bazel build //... --config clang-tidy
 ```
 
 ### use a non-system clang-tidy
+
 by default, bazel_clang_tidy uses the system provided clang-tidy.
 If you have a hermetic build, you can use your own clang-tidy target like this:
-```
+
+```text
 build:clang-tidy --@bazel_clang_tidy//:clang_tidy_executable=@local_config_cc//:clangtidy_bin
 ```
 
@@ -99,18 +100,22 @@ Edit `.clang-tidy` as needed.
 
 To see the tool in action:
 
-1.  Clone the repository
-2.  Run clang-tidy:
+1. Clone the repository
+1. Run clang-tidy:
 
-        bazel build //example --aspects clang_tidy/clang_tidy.bzl%clang_tidy_aspect --output_groups=report
+    ```sh
+    bazel build //example --aspects clang_tidy/clang_tidy.bzl%clang_tidy_aspect --output_groups=report
+    ```
 
-3.  Check the error:
+1. Check the error:
 
-        lib.cpp:4:43: error: the parameter 'name' is copied for each invocation but only used as a const reference; consider making it a const reference [performance-unnecessary-value-param,-warnings-as-errors] std::string lib_get_greet_for(std::string name)
-        Aspect //clang_tidy:clang_tidy.bzl%clang_tidy_aspect of //example:app failed to build
+    ```text
+    lib.cpp:4:43: error: the parameter 'name' is copied for each invocation but only used as a const reference; consider making it a const reference [performance-unnecessary-value-param,-warnings-as-errors] std::string lib_get_greet_for(std::string name)
+    Aspect //clang_tidy:clang_tidy.bzl%clang_tidy_aspect of //example:app failed to build
+    ```
 
-4.  Fix the error by changing `lib.cpp` only.
-5.  Re-run clang-tidy with the same command. Observe that it does not run clang-tidy for `app.cpp`: the cached report is re-used.
+1. Fix the error by changing `lib.cpp` only.
+1. Re-run clang-tidy with the same command. Observe that it does not run clang-tidy for `app.cpp`: the cached report is re-used.
 
 ## Requirements
 
