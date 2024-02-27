@@ -85,6 +85,15 @@ build:clang-tidy --@bazel_clang_tidy//:clang_tidy_executable=@local_config_cc//:
 This aspect is not executed on external targets. To exclude other targets,
 users may tag a target with `no-clang-tidy` or `noclangtidy`.
 
+### Passing compiler options
+
+If you need to pass specific compiler option directly to clang (after "--")
+you can use ### use a non-system clang-tidy like this
+
+```text
+build:clang-tidy --cxxopt='-Wno-error=deprecated-declarations'
+```
+
 ## Features
 
 - Run clang-tidy on any C++ target
