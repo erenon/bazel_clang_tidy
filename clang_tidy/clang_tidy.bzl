@@ -60,7 +60,10 @@ def _run_tidy(
         args.add("-F" + i)
 
     for i in compilation_context.includes.to_list():
-        args.add("-I" + i)
+        if '/_virtual_includes/' in i:
+            args.add("-isystem", i)
+        else:
+            args.add("-I" + i)
 
     args.add_all(compilation_context.quote_includes.to_list(), before_each = "-iquote")
 
