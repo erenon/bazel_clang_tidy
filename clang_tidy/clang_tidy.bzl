@@ -140,16 +140,19 @@ def _clang_tidy_aspect_impl(target, ctx):
     if target.label.workspace_root.startswith("external"):
         return []
 
+    print ("a!")
     # Targets with specific tags will not be formatted
     ignore_tags = [
         "noclangtidy",
         "no-clang-tidy",
     ]
 
+    print ("b!")
     for tag in ignore_tags:
         if tag in ctx.rule.attr.tags:
             return []
 
+    print ("c!")
     wrapper = ctx.attr._clang_tidy_wrapper.files_to_run
     exe = ctx.attr._clang_tidy_executable
     additional_deps = ctx.attr._clang_tidy_additional_deps
@@ -162,6 +165,7 @@ def _clang_tidy_aspect_impl(target, ctx):
 
     srcs = _rule_sources(ctx)
 
+    print ("d!")
     outputs = [
         _run_tidy(
             ctx,
@@ -177,6 +181,7 @@ def _clang_tidy_aspect_impl(target, ctx):
         for src in srcs
     ]
 
+    print ("e!")
     return [
         OutputGroupInfo(report = depset(direct = outputs)),
     ]
