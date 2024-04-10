@@ -170,6 +170,8 @@ def _clang_tidy_aspect_impl(target, ctx):
     srcs = _rule_sources(ctx)
 
     print ("d!")
+    print ("srcs:")
+    print (srcs)
     outputs = [
         _run_tidy(
             ctx,
