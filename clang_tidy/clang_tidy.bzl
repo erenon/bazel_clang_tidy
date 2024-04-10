@@ -132,7 +132,9 @@ def _clang_tidy_aspect_impl(target, ctx):
     print ("hi!")
     # if not a C/C++ target, we are not interested
     if not CcInfo in target:
+        print ("skip it")
         return []
+    print ("keep on truckin")
 
     # Ignore external targets
     if target.label.workspace_root.startswith("external"):
