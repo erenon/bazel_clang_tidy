@@ -96,6 +96,8 @@ def _rule_sources(ctx):
 
     print ("ctx.rule.attr")
     print (str(ctx.rule.attr))
+    print ("ctx.rule.attr.binary_with_debug")
+    print (str(ctx.rule.attr.binary_with_debug))
     srcs = []
     if hasattr(ctx.rule.attr, "srcs"):
         for src in ctx.rule.attr.srcs:
