@@ -138,7 +138,8 @@ def _safe_flags(flags):
     return [flag for flag in flags if flag not in unsupported_flags]
 
 def _clang_tidy_aspect_impl(target, ctx):
-    print ("hi!")
+    print ("target")
+    print (target)
     # if not a C/C++ target, we are not interested
     if not CcInfo in target:
         print ("skip it")
