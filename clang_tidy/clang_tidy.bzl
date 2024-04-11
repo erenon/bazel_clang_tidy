@@ -66,9 +66,6 @@ def _run_tidy(
 
     args.add_all(compilation_context.system_includes.to_list(), before_each = "-isystem")
     print ("run")
-    print (inputs)
-    print (outfile)
-    print (wrapper)
     print (args)
     ctx.actions.run(
         inputs = inputs,
@@ -94,11 +91,6 @@ def _rule_sources(ctx):
                 return True
         return False
 
-    print ("ctx.rule.attr")
-    print (str(ctx.rule.attr))
-    if hasattr(ctx.rule.attr, "binary_with_debug"):
-        print ("ctx.rule.attr.binary_with_debug.files")
-        print (ctx.rule.attr.binary_with_debug.files)
     srcs = []
     if hasattr(ctx.rule.attr, "srcs"):
         for src in ctx.rule.attr.srcs:
@@ -138,31 +130,24 @@ def _safe_flags(flags):
     return [flag for flag in flags if flag not in unsupported_flags]
 
 def _clang_tidy_aspect_impl(target, ctx):
-    print ("target")
-    print (target)
     # if not a C/C++ target, we are not interested
     if not CcInfo in target:
-        print ("skip it")
         return []
-    print ("keep on truckin")
 
     # Ignore external targets
     if target.label.workspace_root.startswith("external"):
         return []
 
-    print ("a!")
     # Targets with specific tags will not be formatted
     ignore_tags = [
         "noclangtidy",
         "no-clang-tidy",
     ]
 
-    print ("b!")
     for tag in ignore_tags:
         if tag in ctx.rule.attr.tags:
             return []
 
-    print ("c!")
     wrapper = ctx.attr._clang_tidy_wrapper.files_to_run
     exe = ctx.attr._clang_tidy_executable
     additional_deps = ctx.attr._clang_tidy_additional_deps
@@ -175,9 +160,6 @@ def _clang_tidy_aspect_impl(target, ctx):
 
     srcs = _rule_sources(ctx)
 
-    print ("d!")
-    print ("srcs:")
-    print (srcs)
     outputs = [
         _run_tidy(
             ctx,
@@ -193,7 +175,6 @@ def _clang_tidy_aspect_impl(target, ctx):
         for src in srcs
     ]
 
-    print ("e!")
     return [
         OutputGroupInfo(report = depset(direct = outputs)),
     ]
