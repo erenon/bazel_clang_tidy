@@ -65,8 +65,6 @@ def _run_tidy(
     args.add_all(compilation_context.quote_includes.to_list(), before_each = "-iquote")
 
     args.add_all(compilation_context.system_includes.to_list(), before_each = "-isystem")
-    #print ("run")
-    #print (args)
     ctx.actions.run(
         inputs = inputs,
         outputs = [outfile],
@@ -190,5 +188,4 @@ clang_tidy_aspect = aspect(
         "_clang_tidy_config": attr.label(default = Label("//:clang_tidy_config")),
     },
     toolchains = ["@bazel_tools//tools/cpp:toolchain_type"],
-    apply_to_generating_rules = True,
 )
