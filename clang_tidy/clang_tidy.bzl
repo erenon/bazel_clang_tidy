@@ -209,4 +209,5 @@ clang_tidy_aspect = aspect(
         "_clang_tidy_config": attr.label(default = Label("//:clang_tidy_config")),
     },
     toolchains = ["@bazel_tools//tools/cpp:toolchain_type"],
+    apply_to_generating_rules = True,
 )
