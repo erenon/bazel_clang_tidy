@@ -99,7 +99,7 @@ def _rule_sources(ctx):
     if hasattr(ctx.rule.attr, "binary_with_debug"):
         print ("invoking _rule_sources() recursively")
         srcs2 = _rule_sources(ctx.rule.attr.binary_with_debug)
-        print (f"returned: {src2})
+        print (f"returned: {src2}")
     srcs = []
     if hasattr(ctx.rule.attr, "srcs"):
         for src in ctx.rule.attr.srcs:
