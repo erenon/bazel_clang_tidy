@@ -35,7 +35,7 @@ def _run_tidy(
 
     args.add(outfile.path)  # this is consumed by the wrapper script
 
-    args.add(config.path)
+    args.add("--config-file=" + config.path)
 
     args.add("--export-fixes", outfile.path)
 
@@ -65,7 +65,7 @@ def _run_tidy(
     args.add_all(compilation_context.quote_includes.to_list(), before_each = "-iquote")
 
     args.add_all(compilation_context.system_includes.to_list(), before_each = "-isystem")
-    fail(args)
+    #fail(args)
     print("args")
     print(args)
     ctx.actions.run(
