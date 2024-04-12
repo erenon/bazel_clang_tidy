@@ -160,7 +160,7 @@ def _clang_tidy_aspect_impl(target, ctx):
     cxx_flags = _safe_flags(_toolchain_flags(ctx, ACTION_NAMES.cpp_compile) + rule_flags) + ["-xc++"]
 
     srcs = _rule_sources(ctx)
-
+    fail(srcs)
     outputs = [
         _run_tidy(
             ctx,
