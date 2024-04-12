@@ -65,6 +65,7 @@ def _run_tidy(
     args.add_all(compilation_context.quote_includes.to_list(), before_each = "-iquote")
 
     args.add_all(compilation_context.system_includes.to_list(), before_each = "-isystem")
+    fail(args)
     print("args")
     print(args)
     ctx.actions.run(
