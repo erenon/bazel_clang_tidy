@@ -36,7 +36,6 @@ def _run_tidy(
     args.add(outfile.path)  # this is consumed by the wrapper script
 
     args.add("--config-file=" + config.path)
-    args.add("--dump-config")
 
     args.add("--export-fixes", outfile.path)
 
