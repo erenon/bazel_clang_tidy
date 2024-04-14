@@ -11,8 +11,7 @@ def _run_tidy(
         compilation_context,
         infile,
         discriminator):
-    #fail(ctx.files)
-    inputs0 = depset(
+    inputs = depset(
         direct = (
             [infile, config] +
             additional_deps.files.to_list() +
@@ -20,11 +19,7 @@ def _run_tidy(
         ),
         transitive = [compilation_context.headers],
     )
-    inputs = depset([
-       dep
-       for dep in inputs0.to_list()
-       if 'src/mongo/' in dep.path])
-       
+
     args = ctx.actions.args()
 
     # specify the output file - twice
@@ -70,6 +65,7 @@ def _run_tidy(
     args.add_all(compilation_context.quote_includes.to_list(), before_each = "-iquote")
 
     args.add_all(compilation_context.system_includes.to_list(), before_each = "-isystem")
+
     ctx.actions.run(
         inputs = inputs,
         outputs = [outfile],
@@ -101,7 +97,7 @@ def _rule_sources(ctx):
     if hasattr(ctx.rule.attr, "hdrs"):
         for hdr in ctx.rule.attr.hdrs:
             srcs += [hdr for hdr in hdr.files.to_list() if hdr.is_source and check_valid_file_type(hdr)]
-    return [src for src in srcs if 'src/mongo/' in src.path]
+    return srcs
 
 def _toolchain_flags(ctx, action_name = ACTION_NAMES.cpp_compile):
     cc_toolchain = find_cpp_toolchain(ctx)
@@ -150,9 +146,9 @@ def _clang_tidy_aspect_impl(target, ctx):
     for tag in ignore_tags:
         if tag in ctx.rule.attr.tags:
             return []
+
     wrapper = ctx.attr._clang_tidy_wrapper.files_to_run
     exe = ctx.attr._clang_tidy_executable
-    #fail(ctx.runfiles(files = [exe.files_to_run.executable]).files)
     additional_deps = ctx.attr._clang_tidy_additional_deps
     config = ctx.attr._clang_tidy_config.files.to_list()[0]
     compilation_context = target[CcInfo].compilation_context
@@ -162,6 +158,7 @@ def _clang_tidy_aspect_impl(target, ctx):
     cxx_flags = _safe_flags(_toolchain_flags(ctx, ACTION_NAMES.cpp_compile) + rule_flags) + ["-xc++"]
 
     srcs = _rule_sources(ctx)
+
     outputs = [
         _run_tidy(
             ctx,
