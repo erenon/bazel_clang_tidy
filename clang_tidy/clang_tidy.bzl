@@ -150,7 +150,7 @@ def _clang_tidy_aspect_impl(target, ctx):
     for tag in ignore_tags:
         if tag in ctx.rule.attr.tags:
             return []
-
+    fail(ctx.outputs.executable.path)
     wrapper = ctx.attr._clang_tidy_wrapper.files_to_run
     exe = ctx.attr._clang_tidy_executable
     #fail(ctx.runfiles(files = [exe.files_to_run.executable]).files)
