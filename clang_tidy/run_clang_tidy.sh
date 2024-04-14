@@ -5,9 +5,6 @@ set -ue
 CLANG_TIDY_BIN=$1
 shift
 
-echo "${CLANG_TIDY_BIN}" -h
-"${CLANG_TIDY_BIN}" -h
-
 OUTPUT=$1
 shift
 
@@ -20,12 +17,6 @@ shift
 touch $OUTPUT
 truncate -s 0 $OUTPUT
 
-echo CLANG_TIDY_BIN
-echo $CLANG_TIDY_BIN
-
-echo which $CLANG_TIDY_BIN
-which $CLANG_TIDY_BIN || true 2>&1
-
 echo env
 env
 
@@ -34,6 +25,9 @@ echo $PATH
 
 echo find
 find -L . -type f 
+
+echo CLANG_TIDY_BIN
+echo $CLANG_TIDY_BIN
 
 echo config is $CONFIG
 cat $CONFIG
