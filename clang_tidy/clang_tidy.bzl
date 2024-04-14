@@ -153,7 +153,7 @@ def _clang_tidy_aspect_impl(target, ctx):
 
     wrapper = ctx.attr._clang_tidy_wrapper.files_to_run
     exe = ctx.attr._clang_tidy_executable
-    fail(ctx.runfiles(files = [exe.files_to_run.executable]))
+    fail(ctx.runfiles(files = [exe.files_to_run.executable]).files)
     additional_deps = ctx.attr._clang_tidy_additional_deps
     config = ctx.attr._clang_tidy_config.files.to_list()[0]
     compilation_context = target[CcInfo].compilation_context
