@@ -11,7 +11,7 @@ def _run_tidy(
         compilation_context,
         infile,
         discriminator):
-    fail(wrapper)
+    fail(exe.files_to_run.executable)
     inputs0 = depset(
         direct = (
             [infile, config] +
