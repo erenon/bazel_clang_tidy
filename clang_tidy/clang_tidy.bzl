@@ -11,7 +11,7 @@ def _run_tidy(
         compilation_context,
         infile,
         discriminator):
-    fail(dir(additional_deps.files.to_list()))
+    fail(dir(additional_deps.files.to_list()[0]))
     additional_deps_wo_3p = [
         f
         for f in additional_deps.files.to_list()
