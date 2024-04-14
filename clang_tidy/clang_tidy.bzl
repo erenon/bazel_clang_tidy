@@ -22,7 +22,7 @@ def _run_tidy(
     inputs = depset([
        dep
        for dep in inputs0.to_list()
-       if 'src/third_party' not in dep.path])
+       if 'src/third_party/' not in dep.path and 'stow/' not in dep.path])
        
     fail(inputs)
 
