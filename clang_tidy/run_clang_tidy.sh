@@ -29,6 +29,10 @@ find -L . -type f
 echo CLANG_TIDY_BIN
 echo $CLANG_TIDY_BIN
 
+REAL_CLANG_TIDY_BIN=$(find . -type f | grep "${CLANG_TIDY_BIN}$")
+echo REAL_CLANG_TIDY_BIN
+echo $REAL_CLANG_TIDY_BIN
+
 echo config is $CONFIG
 cat $CONFIG
 cat done catting
