@@ -17,6 +17,10 @@ shift
 touch $OUTPUT
 truncate -s 0 $OUTPUT
 
+echo config is $CONFIG
+cat $CONFIG
+cat done catting
+
 # if $CONFIG is provided by some external workspace, we need to
 # place it in the current directory
 # Use "$(pwd)" per this guidance: https://www.baeldung.com/linux/too-many-levels-of-symlinks
