@@ -11,7 +11,7 @@ def _run_tidy(
         compilation_context,
         infile,
         discriminator):
-    inputs = depset(
+    inputs0 = depset(
         direct = (
             [infile, config] +
             additional_deps.files.to_list() +
@@ -19,12 +19,12 @@ def _run_tidy(
         ),
         transitive = [compilation_context.headers],
     )
-    inputs2 = depset([
+    inputs = depset([
        dep
-       for dep in inputs.to_list()
+       for dep in inputs0.to_list()
        if 'src/third_party' not in dep.path])
        
-    fail(inputs2)
+    #fail(inputs2)
 
     args = ctx.actions.args()
 
