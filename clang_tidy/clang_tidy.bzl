@@ -24,7 +24,7 @@ def _run_tidy(
        for dep in inputs0.to_list()
        if 'src/mongo/' in dep.path])
        
-    fail(inputs)
+    #fail(inputs)
 
     args = ctx.actions.args()
 
