@@ -103,7 +103,7 @@ def _rule_sources(ctx):
     if hasattr(ctx.rule.attr, "hdrs"):
         for hdr in ctx.rule.attr.hdrs:
             srcs += [hdr for hdr in hdr.files.to_list() if hdr.is_source and check_valid_file_type(hdr)]
-    return [src for src in srcs if 'src/mongo/' in src]
+    return [src for src in srcs if 'src/mongo/' in src.path]
 
 def _toolchain_flags(ctx, action_name = ACTION_NAMES.cpp_compile):
     cc_toolchain = find_cpp_toolchain(ctx)
