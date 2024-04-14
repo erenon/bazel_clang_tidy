@@ -23,6 +23,9 @@ echo $CLANG_TIDY_BIN
 echo env
 env
 
+echo PATH
+echo $PATH
+
 echo find
 find -L . -type f 
 
