@@ -11,20 +11,20 @@ def _run_tidy(
         compilation_context,
         infile,
         discriminator):
-    # fail(dir(additional_deps.files.to_list()[0]))
-    additional_deps_wo_3p = [
-        f
-        for f in additional_deps.files.to_list()
-        if 'src/third_party' not in f.dirname]
     inputs = depset(
         direct = (
             [infile, config] +
-            additional_deps_wo_3p +
+            additional_deps.files.to_list() +
             ([exe.files_to_run.executable] if exe.files_to_run.executable else [])
         ),
         transitive = [compilation_context.headers],
     )
-    #fail(inputs)
+    inputs2 = depset([
+       dep
+       for dep in inputs.to_list()
+       if 'src/third_party' not in dep])
+       
+    fail(inputs2)
 
     args = ctx.actions.args()
 
