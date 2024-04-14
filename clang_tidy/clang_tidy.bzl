@@ -24,7 +24,7 @@ def _run_tidy(
        for dep in inputs0.to_list()
        if 'src/third_party' not in dep.path])
        
-    #fail(inputs2)
+    fail(inputs2)
 
     args = ctx.actions.args()
 
