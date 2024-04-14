@@ -40,4 +40,4 @@ set -- \
 echo clang command
 echo "${CLANG_TIDY_BIN}" "$@"
 
-"${CLANG_TIDY_BIN}" "$@" --dump-config >"$logfile" 2>&1
+"${CLANG_TIDY_BIN}" --config=.clang-tidy "$@" >"$logfile" 2>&1
