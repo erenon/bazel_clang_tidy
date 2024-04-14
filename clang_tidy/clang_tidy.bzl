@@ -24,8 +24,6 @@ def _run_tidy(
        for dep in inputs0.to_list()
        if 'src/mongo/' in dep.path])
        
-    #fail(inputs)
-
     args = ctx.actions.args()
 
     # specify the output file - twice
@@ -71,7 +69,6 @@ def _run_tidy(
     args.add_all(compilation_context.quote_includes.to_list(), before_each = "-iquote")
 
     args.add_all(compilation_context.system_includes.to_list(), before_each = "-isystem")
-    #fail(args)
     ctx.actions.run(
         inputs = inputs,
         outputs = [outfile],
@@ -157,8 +154,6 @@ def _clang_tidy_aspect_impl(target, ctx):
     exe = ctx.attr._clang_tidy_executable
     additional_deps = ctx.attr._clang_tidy_additional_deps
     config = ctx.attr._clang_tidy_config.files.to_list()[0]
-    print ("config is")
-    fail(config)
     compilation_context = target[CcInfo].compilation_context
 
     rule_flags = ctx.rule.attr.copts if hasattr(ctx.rule.attr, "copts") else []
