@@ -21,7 +21,7 @@ echo CLANG_TIDY_BIN
 echo $CLANG_TIDY_BIN
 
 echo which $CLANG_TIDY_BIN
-which $CLANG_TIDY_BIN
+which $CLANG_TIDY_BIN || true 2>&1
 
 echo env
 env
