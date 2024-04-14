@@ -17,31 +17,12 @@ shift
 touch $OUTPUT
 truncate -s 0 $OUTPUT
 
-echo env
-env
-
-echo PATH
-echo $PATH
-
-echo find
-find -L . -type f 
-
-echo CLANG_TIDY_BIN
-echo $CLANG_TIDY_BIN
-
-REAL_CLANG_TIDY_BIN=$(find . -type f | grep "${CLANG_TIDY_BIN}$")
-echo REAL_CLANG_TIDY_BIN
-echo $REAL_CLANG_TIDY_BIN
-
-echo config is $CONFIG
-cat $CONFIG
-cat done catting
+echo find . -type f
+find . -type f
 
 # if $CONFIG is provided by some external workspace, we need to
 # place it in the current directory
-# Use "$(pwd)" per this guidance: https://www.baeldung.com/linux/too-many-levels-of-symlinks
-test -e .clang-tidy || ln -s -f ../$CONFIG .clang-tidy
-#test -e .clang-tidy || cp -L $CONFIG .clang-tidy
+test -e .clang-tidy || ln -s -f $CONFIG .clang-tidy
 
 # Print output on failure only
 logfile="$(mktemp)"
@@ -59,12 +40,4 @@ set -- \
   --warnings-as-errors=-clang-diagnostic-builtin-macro-redefined \
    "$@"
 
-echo clang_tidy_command
-echo "${CLANG_TIDY_BIN}" --config=$(eval cat .clang-tidy) "$@"
-exit 1
-
-
-# MDB's variant of clang (for llvm) uses --config different
-# Per this recommendation (https://github.com/ch1bo/flycheck-clang-tidy/issues/12) we're "eval"-ing .clang-tidy
-# to ensure it's properly parsed:
-"${CLANG_TIDY_BIN}" --config=$(eval cat ./.clang-tidy) "$@" >"$logfile" 2>&1
+"${CLANG_TIDY_BIN}" "$@" >"$logfile" 2>&1
