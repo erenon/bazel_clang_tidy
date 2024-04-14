@@ -5,6 +5,9 @@ set -ue
 CLANG_TIDY_BIN=$1
 shift
 
+echo "${CLANG_TIDY_BIN}" -h
+"${CLANG_TIDY_BIN}" -h
+
 OUTPUT=$1
 shift
 
