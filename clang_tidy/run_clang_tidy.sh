@@ -20,8 +20,8 @@ truncate -s 0 $OUTPUT
 # if $CONFIG is provided by some external workspace, we need to
 # place it in the current directory
 # Use "$(pwd)" per this guidance: https://www.baeldung.com/linux/too-many-levels-of-symlinks
-#test -e .clang-tidy || ln -s -f "$(pwd)/$CONFIG" .clang-tidy
-test -e .clang-tidy || cp -L $CONFIG .clang-tidy
+test -e .clang-tidy || ln -s -f "$(pwd)/$CONFIG" .clang-tidy
+#test -e .clang-tidy || cp -L $CONFIG .clang-tidy
 
 # Print output on failure only
 logfile="$(mktemp)"
