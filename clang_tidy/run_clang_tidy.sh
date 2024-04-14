@@ -17,6 +17,9 @@ shift
 touch $OUTPUT
 truncate -s 0 $OUTPUT
 
+echo env
+env
+
 echo find
 find -L . -type f 
 
