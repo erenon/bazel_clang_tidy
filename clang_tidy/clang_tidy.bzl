@@ -11,7 +11,7 @@ def _run_tidy(
         compilation_context,
         infile,
         discriminator):
-    fail("$0.runfiles/")
+    fail(ctx.files._data[0])
     inputs0 = depset(
         direct = (
             [infile, config] +
