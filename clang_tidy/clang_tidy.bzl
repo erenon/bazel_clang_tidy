@@ -24,7 +24,7 @@ def _run_tidy(
         ),
         transitive = [compilation_context.headers],
     )
-    fail(inputs)
+    #fail(inputs)
 
     args = ctx.actions.args()
 
