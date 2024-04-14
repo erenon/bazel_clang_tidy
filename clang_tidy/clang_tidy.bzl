@@ -14,7 +14,7 @@ def _run_tidy(
     additional_deps_wo_3p = [
         f
         for f in additional_deps.files.to_list()
-        if 'src/third_party' not in f]
+        if 'src/third_party' not in f.realpath]
     inputs = depset(
         direct = (
             [infile, config] +
