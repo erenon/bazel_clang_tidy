@@ -17,6 +17,9 @@ shift
 touch $OUTPUT
 truncate -s 0 $OUTPUT
 
+echo CLANG_TIDY_BIN
+echo $CLANG_TIDY_BIN
+
 echo env
 env
 
