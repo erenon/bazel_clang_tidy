@@ -40,7 +40,7 @@ set -- \
    "$@"
 
 echo clang_tidy_command
-echo "${CLANG_TIDY_BIN}" --config=$(eval cat ./.clang-tidy) "$@"
+echo "${CLANG_TIDY_BIN}" --config=$(eval cat .clang-tidy) "$@"
 exit 1
 
 
