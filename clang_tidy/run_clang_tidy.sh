@@ -37,7 +37,7 @@ set -- \
   --warnings-as-errors=-clang-diagnostic-builtin-macro-redefined \
    "$@"
 
-echo clang command
-echo "${CLANG_TIDY_BIN}" "$@"
-
+# MDB's variant of clang (for llvm) uses --config different
+# Per this recommendation (https://github.com/ch1bo/flycheck-clang-tidy/issues/12) we're "eval"-ing .clang-tidy
+# to ensure it's properly parsed:
 "${CLANG_TIDY_BIN}" --config=$(eval cat ./.clang-tidy) "$@" >"$logfile" 2>&1
