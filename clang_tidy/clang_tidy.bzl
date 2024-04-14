@@ -11,11 +11,11 @@ def _run_tidy(
         compilation_context,
         infile,
         discriminator):
-    fail(dir(additional_deps.files.to_list()[0]))
+    # fail(dir(additional_deps.files.to_list()[0]))
     additional_deps_wo_3p = [
         f
         for f in additional_deps.files.to_list()
-        if 'src/third_party' not in f.realpath]
+        if 'src/third_party' not in f.dirname]
     inputs = depset(
         direct = (
             [infile, config] +
