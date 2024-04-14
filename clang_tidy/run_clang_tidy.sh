@@ -17,12 +17,12 @@ shift
 touch $OUTPUT
 truncate -s 0 $OUTPUT
 
+echo find
+find -L . -type f 
+
 echo config is $CONFIG
 cat $CONFIG
 cat done catting
-
-echo find
-find -L . -type f 
 
 # if $CONFIG is provided by some external workspace, we need to
 # place it in the current directory
