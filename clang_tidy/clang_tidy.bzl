@@ -18,8 +18,7 @@ def _run_tidy(
             ([exe.files_to_run.executable] if exe.files_to_run.executable else [])
         ),
         transitive = [compilation_context.headers],
-    )
-       
+    )       
     args = ctx.actions.args()
 
     # specify the output file - twice
@@ -65,6 +64,7 @@ def _run_tidy(
     args.add_all(compilation_context.quote_includes.to_list(), before_each = "-iquote")
 
     args.add_all(compilation_context.system_includes.to_list(), before_each = "-isystem")
+
     ctx.actions.run(
         inputs = inputs,
         outputs = [outfile],
@@ -145,6 +145,7 @@ def _clang_tidy_aspect_impl(target, ctx):
     for tag in ignore_tags:
         if tag in ctx.rule.attr.tags:
             return []
+
     wrapper = ctx.attr._clang_tidy_wrapper.files_to_run
     exe = ctx.attr._clang_tidy_executable
     additional_deps = ctx.attr._clang_tidy_additional_deps
@@ -156,6 +157,7 @@ def _clang_tidy_aspect_impl(target, ctx):
     cxx_flags = _safe_flags(_toolchain_flags(ctx, ACTION_NAMES.cpp_compile) + rule_flags) + ["-xc++"]
 
     srcs = _rule_sources(ctx)
+
     outputs = [
         _run_tidy(
             ctx,
