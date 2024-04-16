@@ -191,6 +191,7 @@ clang_tidy_aspect = aspect(
         "_clang_tidy_executable": attr.label(default = Label("//:clang_tidy_executable")),
         "_clang_tidy_additional_deps": attr.label(default = Label("//:clang_tidy_additional_deps")),
         "_clang_tidy_config": attr.label(default = Label("//:clang_tidy_config")),
+        "_clang_tidy_src_must_contain_substring": attr.label(default = Label("//:clang_tidy_src_must_contain_substring")),
     },
     toolchains = ["@bazel_tools//tools/cpp:toolchain_type"],
 )
