@@ -18,7 +18,8 @@ def _run_tidy(
             ([exe.files_to_run.executable] if exe.files_to_run.executable else [])
         ),
         transitive = [compilation_context.headers],
-    )       
+    )
+
     args = ctx.actions.args()
 
     # specify the output file - twice
