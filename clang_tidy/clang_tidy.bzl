@@ -11,8 +11,7 @@ def _run_tidy(
         compilation_context,
         infile,
         discriminator):
-    #fail(ctx.files)
-    inputs0 = depset(
+    inputs = depset(
         direct = (
             [infile, config] +
             additional_deps.files.to_list() +
@@ -20,11 +19,6 @@ def _run_tidy(
         ),
         transitive = [compilation_context.headers],
     )
-    inputs = depset([
-       dep
-       for dep in inputs0.to_list()
-       #if 'src/mongo/' in dep.path]
-    ])
        
     args = ctx.actions.args()
 
@@ -153,7 +147,6 @@ def _clang_tidy_aspect_impl(target, ctx):
             return []
     wrapper = ctx.attr._clang_tidy_wrapper.files_to_run
     exe = ctx.attr._clang_tidy_executable
-    #fail(ctx.runfiles(files = [exe.files_to_run.executable]).files)
     additional_deps = ctx.attr._clang_tidy_additional_deps
     config = ctx.attr._clang_tidy_config.files.to_list()[0]
     compilation_context = target[CcInfo].compilation_context
@@ -191,7 +184,6 @@ clang_tidy_aspect = aspect(
         "_clang_tidy_executable": attr.label(default = Label("//:clang_tidy_executable")),
         "_clang_tidy_additional_deps": attr.label(default = Label("//:clang_tidy_additional_deps")),
         "_clang_tidy_config": attr.label(default = Label("//:clang_tidy_config")),
-        "_clang_tidy_src_must_contain_substring": attr.string(),
     },
     toolchains = ["@bazel_tools//tools/cpp:toolchain_type"],
 )
