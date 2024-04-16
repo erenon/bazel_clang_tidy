@@ -23,7 +23,8 @@ def _run_tidy(
     inputs = depset([
        dep
        for dep in inputs0.to_list()
-       if 'src/mongo/' in dep.path])
+       #if 'src/mongo/' in dep.path]
+       )
        
     args = ctx.actions.args()
 
