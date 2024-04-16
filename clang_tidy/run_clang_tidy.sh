@@ -23,7 +23,7 @@ find . -type f
 
 echo ls -l ./bazel-out/aarch64-fastbuild/bin/external/bazel_clang_tidy/clang_tidy/clang_tidy
 ls -l ./bazel-out/aarch64-fastbuild/bin/external/bazel_clang_tidy/clang_tidy/clang_tidy
-CLANG_TIDY_BIN="./bazel-out/aarch64-fastbuild/bin/external/bazel_clang_tidy/clang_tidy/clang_tidy"
+# CLANG_TIDY_BIN="./bazel-out/aarch64-fastbuild/bin/external/bazel_clang_tidy/clang_tidy/clang_tidy"
 
 
 # if $CONFIG is provided by some external workspace, we need to
