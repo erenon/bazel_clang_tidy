@@ -17,6 +17,7 @@ shift
 touch $OUTPUT
 truncate -s 0 $OUTPUT
 
+echo PATH is $PATH
 echo find . -type f
 find . -type f
 
