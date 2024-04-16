@@ -17,15 +17,6 @@ shift
 touch $OUTPUT
 truncate -s 0 $OUTPUT
 
-echo PATH is $PATH
-echo find . -type f
-find . -type f
-
-echo ls -l ./bazel-out/aarch64-fastbuild/bin/external/bazel_clang_tidy/clang_tidy/clang_tidy
-ls -l ./bazel-out/aarch64-fastbuild/bin/external/bazel_clang_tidy/clang_tidy/clang_tidy
-# CLANG_TIDY_BIN="./bazel-out/aarch64-fastbuild/bin/external/bazel_clang_tidy/clang_tidy/clang_tidy"
-
-
 # if $CONFIG is provided by some external workspace, we need to
 # place it in the current directory
 test -e .clang-tidy || ln -s -f $CONFIG .clang-tidy
