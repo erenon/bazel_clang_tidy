@@ -73,6 +73,60 @@ Now from the command line this is a lot nicer to use;
 bazel build //... --config clang-tidy
 ```
 
+### Use clang_tidy_test rule
+
+You cane use rule `clang_tidy_test` to test your files with clang-tidy.
+
+Example code is located here: `example/cc_test_example`
+
+You can run example with:
+
+```sh
+bazel test //example/cc_test_example:example_tests
+```
+
+This command is a `test_suite` for build and run your program and run clang-tidy on example files.
+
+To define clang-tidy test you simply add this rule to your `BUILD` file:
+
+```text
+load("@bazel_clang_tidy//clang_tidy:clang_tidy_test.bzl", "clang_tidy_test")
+clang_tidy_test(
+    name = '<TEST_NAME>',
+    srcs = [
+        "a.hpp"
+        "a.cpp"
+    ],
+)
+```
+
+In this rule, you can use the same arguments as in the aspect (they are public here - easier to set):
+
+```text
+'deps' : attr.label_list(),
+"cc_toolchain": attr.label(default = Label("@bazel_tools//tools/cpp:current_cc_toolchain")),
+"clang_tidy_wrapper": attr.label(default = Label("//clang_tidy:clang_tidy")),
+"clang_tidy_executable": attr.label(default = Label("//:clang_tidy_executable")),
+"clang_tidy_additional_deps": attr.label(default = Label("//:clang_tidy_additional_deps")),
+"clang_tidy_config": attr.label(default = Label("//:clang_tidy_config")),
+'srcs' : attr.label_list(allow_files = True),
+'hdrs' : attr.label_list(allow_files = True),
+```
+
+They can be set as follows:
+
+```text
+clang_tidy_test(
+  name = "clang_tidy_test",
+  clang_tidy_config = "//:clang_tidy_config",
+  clang_tidy_additional_deps = "//:clang_tidy_additional_deps",
+  srcs = [
+    ":test_sources"
+  ],
+  deps = ["some_deps"],
+)
+```
+
 ### use a non-system clang-tidy
 
 by default, bazel_clang_tidy uses the system provided clang-tidy.
@@ -104,7 +158,7 @@ To see the tool in action:
 1. Run clang-tidy:
 
     ```sh
-    bazel build //example --aspects clang_tidy/clang_tidy.bzl%clang_tidy_aspect --output_groups=report
+    bazel build //example:lib --aspects clang_tidy/clang_tidy.bzl%clang_tidy_aspect --output_groups=report
     ```
 
 1. Check the error:
