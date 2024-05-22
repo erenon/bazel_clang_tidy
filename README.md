@@ -111,6 +111,7 @@ In this rule, you can use the same arguments as in the aspect (they are public h
 "clang_tidy_config": attr.label(default = Label("//:clang_tidy_config")),
 'srcs' : attr.label_list(allow_files = True),
 'hdrs' : attr.label_list(allow_files = True),
+'use_flags': attr.bool(default = True),
 ```
 
 They can be set as follows:
@@ -124,6 +125,7 @@ clang_tidy_test(
     ":test_sources"
   ],
   deps = ["some_deps"],
+  use_flags = False, # You want set this to false if you are using compile_commands.json
 )
 ```
 
