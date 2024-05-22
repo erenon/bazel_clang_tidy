@@ -94,12 +94,12 @@ def _clang_tidy_rule_impl(ctx):
     for src in srcs:
         args.append(src.short_path)
 
-    # start args passed to the compiler
-    args.append("--")
-
     # add args specified by the toolchain, on the command line and rule copts
-    for flag in flags:
-        args.append(flag)
+    if ctx.attr.use_flags:
+        # start args passed to the compiler
+        args.append("--")
+        for flag in flags:
+            args.append(flag)
 
     ctx.actions.write(
         output = ctx.outputs.executable,
@@ -127,6 +127,7 @@ clang_tidy_test = rule(
         "clang_tidy_config": attr.label(default = Label("//:clang_tidy_config")),
         'srcs' : attr.label_list(allow_files = True),
         'hdrs' : attr.label_list(allow_files = True),
+        'use_flags': attr.bool(default = True),
     },
     toolchains = ["@bazel_tools//tools/cpp:toolchain_type"],
 )
