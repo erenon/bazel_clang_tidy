@@ -15,7 +15,7 @@ load(
 
 git_repository(
        name = "bazel_clang_tidy",
-       commit = "43bef6852a433f3b2a6b001daecc8bc91d791b92",
+       commit = "bff5c59c843221b05ef0e37cef089ecc9d24e7da",
        remote = "https://github.com/erenon/bazel_clang_tidy.git",
 )
 ```
