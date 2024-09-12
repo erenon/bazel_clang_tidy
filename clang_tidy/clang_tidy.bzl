@@ -66,6 +66,8 @@ def _run_tidy(
 
     args.add_all(compilation_context.system_includes.to_list(), before_each = "-isystem")
 
+    args.add_all(compilation_context.external_includes.to_list(), before_each = "-isystem")
+
     ctx.actions.run(
         inputs = inputs,
         outputs = [outfile],
