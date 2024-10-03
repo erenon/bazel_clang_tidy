@@ -59,12 +59,33 @@ def _run_tidy(
     for i in compilation_context.framework_includes.to_list():
         args.add("-F" + i)
 
-    for i in compilation_context.includes.to_list():
-        args.add("-I" + i)
+    isystems = compilation_context.system_includes.to_list()
 
-    args.add_all(compilation_context.quote_includes.to_list(), before_each = "-iquote")
+    if ctx.attr._clang_tidy_virtual_includes_are_system_includes:
+        # Include anything that uses include_prefix or strip_include_prefix as a system include
+        include_dirs = []
+        for include in compilation_context.includes.to_list():
+            if "/_virtual_includes/" in include:
+                isystems.append(include)
+            else:
+                include_dirs.append(include)
+    else:
+        include_dirs = compilation_context.includes.to_list()
 
-    args.add_all(compilation_context.system_includes.to_list(), before_each = "-isystem")
+    if ctx.attr._clang_tidy_bazel_out_includes_are_system_includes:
+        # Treat generated code in bazel-out/ as system include
+        iquotes = []
+        for quote_include in compilation_context.quote_includes.to_list():
+            if quote_include.startswith("bazel-out/"):
+                isystems.append(quote_include)
+            else:
+                iquotes.append(quote_include)
+    else:
+        iquotes = compilation_context.quote_includes.to_list()
+
+    args.add_all(include_dirs, before_each = "-I")
+    args.add_all(iquotes, before_each = "-iquote")
+    args.add_all(isystems, before_each = "-isystem")
 
     args.add_all(compilation_context.external_includes.to_list(), before_each = "-isystem")
 
@@ -189,6 +210,8 @@ clang_tidy_aspect = aspect(
         "_clang_tidy_executable": attr.label(default = Label("//:clang_tidy_executable")),
         "_clang_tidy_additional_deps": attr.label(default = Label("//:clang_tidy_additional_deps")),
         "_clang_tidy_config": attr.label(default = Label("//:clang_tidy_config")),
+        "_clang_tidy_bazel_out_includes_are_system_includes": attr.label(default = Label("//:clang_tidy_bazel_out_includes_are_system_includes")),
+        "_clang_tidy_virtual_includes_are_system_includes": attr.label(default = Label("//:clang_tidy_virtual_includes_are_system_includes")),
     },
     toolchains = ["@bazel_tools//tools/cpp:toolchain_type"],
 )
