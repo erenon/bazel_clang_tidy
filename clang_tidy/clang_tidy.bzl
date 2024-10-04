@@ -174,7 +174,15 @@ def _clang_tidy_aspect_impl(target, ctx):
     if hasattr(ctx.rule.attr, "implementation_deps"):
         compilation_contexts.extend([implementation_dep[CcInfo].compilation_context for implementation_dep in ctx.rule.attr.implementation_deps])
 
-    rule_flags = ctx.rule.attr.copts if hasattr(ctx.rule.attr, "copts") else []
+    copts = ctx.rule.attr.copts if hasattr(ctx.rule.attr, "copts") else []
+    rule_flags = []
+    for copt in copts:
+        rule_flags.append(ctx.expand_make_variables(
+            "copts",
+            copt,
+            {},
+        ))
+
     c_flags = _safe_flags(_toolchain_flags(ctx, ACTION_NAMES.c_compile) + rule_flags) + ["-xc"]
     cxx_flags = _safe_flags(_toolchain_flags(ctx, ACTION_NAMES.cpp_compile) + rule_flags) + ["-xc++"]
 
