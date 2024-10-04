@@ -20,5 +20,8 @@ cc_library(
 cc_binary(
     name = "example",
     srcs = ["app.cpp"],
-    deps = [":lib", ":lib_ignored"],
+    deps = [
+        ":lib",
+        ":lib_ignored",
+    ],
 )
