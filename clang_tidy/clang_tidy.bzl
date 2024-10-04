@@ -155,7 +155,15 @@ def _clang_tidy_aspect_impl(target, ctx):
     config = ctx.attr._clang_tidy_config.files.to_list()[0]
     compilation_context = target[CcInfo].compilation_context
 
-    rule_flags = ctx.rule.attr.copts if hasattr(ctx.rule.attr, "copts") else []
+    copts = ctx.rule.attr.copts if hasattr(ctx.rule.attr, "copts") else []
+    rule_flags = []
+    for copt in copts:
+        rule_flags.append(ctx.expand_make_variables(
+            "copts",
+            copt,
+            {},
+        ))
+
     c_flags = _safe_flags(_toolchain_flags(ctx, ACTION_NAMES.c_compile) + rule_flags) + ["-xc"]
     cxx_flags = _safe_flags(_toolchain_flags(ctx, ACTION_NAMES.cpp_compile) + rule_flags) + ["-xc++"]
 
