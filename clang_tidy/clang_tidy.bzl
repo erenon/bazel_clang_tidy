@@ -11,13 +11,16 @@ def _run_tidy(
         compilation_contexts,
         infile,
         discriminator):
+    cc_toolchain = find_cpp_toolchain(ctx)
     inputs = depset(
         direct = (
             [infile, config] +
             additional_deps.files.to_list() +
             ([exe.files_to_run.executable] if exe.files_to_run.executable else [])
         ),
-        transitive = [compilation_context.headers for compilation_context in compilation_contexts],
+        transitive =
+          [compilation_context.headers for compilation_context in compilation_contexts] +
+          [cc_toolchain.all_files],
     )
 
     args = ctx.actions.args()
