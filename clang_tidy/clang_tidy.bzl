@@ -107,10 +107,13 @@ def _toolchain_flags(ctx, action_name = ACTION_NAMES.cpp_compile):
         ctx = ctx,
         cc_toolchain = cc_toolchain,
     )
+    user_compile_flags = ctx.fragments.cpp.copts
+    if action_name == ACTION_NAMES.cpp_compile:
+        user_compile_flags.extend(ctx.fragments.cpp.cxxopts)
     compile_variables = cc_common.create_compile_variables(
         feature_configuration = feature_configuration,
         cc_toolchain = cc_toolchain,
-        user_compile_flags = ctx.fragments.cpp.cxxopts + ctx.fragments.cpp.copts,
+        user_compile_flags = user_compile_flags,
     )
     flags = cc_common.get_memory_inefficient_command_line(
         feature_configuration = feature_configuration,
