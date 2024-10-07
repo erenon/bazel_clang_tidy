@@ -83,26 +83,29 @@ def _run_tidy(
     )
     return outfile
 
-def _rule_sources(ctx):
+def _rule_sources(ctx, include_headers):
+    header_extensions = (
+        ".h",
+        ".hh",
+        ".hpp",
+        ".hxx",
+        ".inc",
+        ".inl",
+        ".H",
+    )
+    permitted_file_types = [
+        ".c",
+        ".cc",
+        ".cpp",
+        ".cxx",
+        ".c++",
+        ".C",
+    ] + list(header_extensions)
+
     def check_valid_file_type(src):
         """
         Returns True if the file type matches one of the permitted srcs file types for C and C++ header/source files.
         """
-        permitted_file_types = [
-            ".c",
-            ".cc",
-            ".cpp",
-            ".cxx",
-            ".c++",
-            ".C",
-            ".h",
-            ".hh",
-            ".hpp",
-            ".hxx",
-            ".inc",
-            ".inl",
-            ".H",
-        ]
         for file_type in permitted_file_types:
             if src.basename.endswith(file_type):
                 return True
@@ -115,7 +118,10 @@ def _rule_sources(ctx):
     if hasattr(ctx.rule.attr, "hdrs"):
         for hdr in ctx.rule.attr.hdrs:
             srcs += [hdr for hdr in hdr.files.to_list() if hdr.is_source and check_valid_file_type(hdr)]
-    return srcs
+    if include_headers:
+        return srcs
+    else:
+        return [src for src in srcs if not src.basename.endswith(header_extensions)]
 
 def _toolchain_flags(ctx, action_name = ACTION_NAMES.cpp_compile):
     cc_toolchain = find_cpp_toolchain(ctx)
@@ -189,7 +195,8 @@ def _clang_tidy_aspect_impl(target, ctx):
     c_flags = _safe_flags(_toolchain_flags(ctx, ACTION_NAMES.c_compile) + rule_flags) + ["-xc"]
     cxx_flags = _safe_flags(_toolchain_flags(ctx, ACTION_NAMES.cpp_compile) + rule_flags) + ["-xc++"]
 
-    srcs = _rule_sources(ctx)
+    include_headers = "no-clang-tidy-headers" not in ctx.rule.attr.tags
+    srcs = _rule_sources(ctx, include_headers)
 
     outputs = [
         _run_tidy(
