@@ -19,8 +19,8 @@ def _run_tidy(
             ([exe.files_to_run.executable] if exe.files_to_run.executable else [])
         ),
         transitive =
-          [compilation_context.headers for compilation_context in compilation_contexts] +
-          [cc_toolchain.all_files],
+            [compilation_context.headers for compilation_context in compilation_contexts] +
+            [cc_toolchain.all_files],
     )
 
     args = ctx.actions.args()
