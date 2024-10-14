@@ -132,6 +132,8 @@ def _toolchain_flags(ctx, action_name = ACTION_NAMES.cpp_compile):
     user_compile_flags = ctx.fragments.cpp.copts
     if action_name == ACTION_NAMES.cpp_compile:
         user_compile_flags.extend(ctx.fragments.cpp.cxxopts)
+    elif action_name == ACTION_NAMES.c_compile and hasattr(ctx.fragments.cpp, "conlyopts"):
+        user_compile_flags.extend(ctx.fragments.cpp.conlyopts)
     compile_variables = cc_common.create_compile_variables(
         feature_configuration = feature_configuration,
         cc_toolchain = cc_toolchain,
