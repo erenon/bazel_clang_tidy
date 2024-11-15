@@ -1,5 +1,6 @@
 load("@bazel_tools//tools/build_defs/cc:action_names.bzl", "ACTION_NAMES")
 load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain")
+load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 
 def _run_tidy(
         ctx,
@@ -223,6 +224,12 @@ def _clang_tidy_aspect_impl(target, ctx):
     cxx_flags = safe_flags(toolchain_flags(ctx, ACTION_NAMES.cpp_compile) + rule_flags) + ["-xc++"]
 
     include_headers = "no-clang-tidy-headers" not in ctx.rule.attr.tags
+    run_on_headers = ctx.attr._run_on_headers[BuildSettingInfo].value
+    if type(run_on_headers) == type(True):
+       if not run_on_headers:
+          include_headers = False
+
+
     srcs = rule_sources(ctx.rule.attr, include_headers)
 
     outputs = [
@@ -255,6 +262,7 @@ clang_tidy_aspect = aspect(
         "_clang_tidy_executable": attr.label(default = Label("//:clang_tidy_executable")),
         "_clang_tidy_additional_deps": attr.label(default = Label("//:clang_tidy_additional_deps")),
         "_clang_tidy_config": attr.label(default = Label("//:clang_tidy_config")),
+        "_run_on_headers": attr.label(default = Label("//:run_on_headers")),
     },
     toolchains = ["@bazel_tools//tools/cpp:toolchain_type"],
 )
