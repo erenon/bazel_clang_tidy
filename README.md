@@ -1,6 +1,6 @@
 # bazel_clang_tidy
 
-Run clang-tidy on Bazel C++ targets directly,
+Run clang-tidy on Bazel C/C++ targets directly,
 without generating a compile commands database,
 and take advantage of Bazels powerful cache mechanism.
 
@@ -87,7 +87,8 @@ users may tag a target with `no-clang-tidy` or `noclangtidy`.
 
 ## Features
 
-- Run clang-tidy on any C++ target
+- Run clang-tidy on any C/C++ target
+  - A file is treated as C if it has the `.c` extension or its target includes the `clang-tidy-is-c-tu` tag; otherwise, it is treated as C++.
 - Run clang-tidy without also building the target
 - Use Bazel to cache clang-tidy reports: recompute stale reports only
 
