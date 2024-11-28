@@ -157,6 +157,21 @@ def _safe_flags(flags):
 
     return [flag for flag in flags if flag not in unsupported_flags]
 
+def _is_c_translation_unit(src, tags):
+    """Judge if a source file is for C.
+
+    Args:
+        src(File): Source file object.
+        tags(list[str]): Tags attached to the target.
+
+    Returns:
+        bool: Whether the source is for C.
+    """
+    if "clang-tidy-is-c-tu" in tags:
+        return True
+
+    return src.extension == "c"
+
 def _clang_tidy_aspect_impl(target, ctx):
     # if not a C/C++ target, we are not interested
     if not CcInfo in target:
@@ -207,7 +222,7 @@ def _clang_tidy_aspect_impl(target, ctx):
             exe,
             additional_deps,
             config,
-            c_flags if src.extension == "c" else cxx_flags,
+            c_flags if _is_c_translation_unit(src, ctx.rule.attr.tags) else cxx_flags,
             compilation_contexts,
             src,
             target.label.name,
