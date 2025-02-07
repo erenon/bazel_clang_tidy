@@ -10,14 +10,19 @@ def _run_tidy(
         flags,
         compilation_contexts,
         infile,
-        discriminator):
+        discriminator,
+        additional_inputs):
     cc_toolchain = find_cpp_toolchain(ctx)
+    direct_inputs = (
+        [infile, config] +
+        additional_deps.files.to_list() +
+        ([exe.files_to_run.executable] if exe.files_to_run.executable else [])
+    )
+    for additional_input in additional_inputs:
+        direct_inputs.extend(additional_input.files.to_list())
+
     inputs = depset(
-        direct = (
-            [infile, config] +
-            additional_deps.files.to_list() +
-            ([exe.files_to_run.executable] if exe.files_to_run.executable else [])
-        ),
+        direct = direct_inputs,
         transitive =
             [compilation_context.headers for compilation_context in compilation_contexts] +
             [cc_toolchain.all_files],
@@ -226,6 +231,7 @@ def _clang_tidy_aspect_impl(target, ctx):
             compilation_contexts,
             src,
             target.label.name,
+            additional_inputs = getattr(ctx.rule.attr, "additional_compiler_inputs", []),
         )
         for src in srcs
     ]
