@@ -21,7 +21,9 @@ def _get_copts_attr(ctx, copts_attr):
     return copts
 
 def _clang_tidy_rule_impl(ctx):
-    exe = ctx.attr.clang_tidy_executable
+    clang_tidy = ctx.attr.clang_tidy_executable
+    clang_tidy_executable = clang_tidy[DefaultInfo].files_to_run.executable
+
     ccinfo_copts, additional_files = deps_flags(ctx, ctx.attr.deps, escape = True)
 
     include_headers = "no-clang-tidy-headers" not in ctx.attr.tags
@@ -67,7 +69,7 @@ if [[ "$has_srcs" == "false" ]]; then
   exit 1
 fi
 """.format(
-            clang_tidy_bin = exe[DefaultInfo].files_to_run.executable.short_path,
+            clang_tidy_bin = clang_tidy_executable.short_path if clang_tidy_executable else "clang-tidy",
             clang_tidy_config = ctx.file.clang_tidy_config.short_path,
             output = ctx.outputs.executable.path,
             c_sources = " ".join([x.short_path for x in srcs if is_c_translation_unit(x, ctx.attr.tags)]),
@@ -87,7 +89,7 @@ fi
                     transitive = [additional_files, find_cpp_toolchain(ctx).all_files, ctx.attr.clang_tidy_additional_deps.files],
                 ),
             )
-                .merge(exe[DefaultInfo].default_runfiles),
+                .merge(clang_tidy[DefaultInfo].default_runfiles),
         ),
     ]
 
