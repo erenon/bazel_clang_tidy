@@ -1,5 +1,6 @@
 """A test rule to run clang-tidy"""
 
+load("@bazel_skylib//lib:shell.bzl", "shell")
 load("@bazel_tools//tools/build_defs/cc:action_names.bzl", "ACTION_NAMES")
 load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain")
 load(":clang_tidy.bzl", "deps_flags", "is_c_translation_unit", "rule_sources", "safe_flags", "toolchain_flags")
@@ -24,7 +25,7 @@ def _clang_tidy_rule_impl(ctx):
     clang_tidy = ctx.attr.clang_tidy_executable
     clang_tidy_executable = clang_tidy[DefaultInfo].files_to_run.executable
 
-    ccinfo_copts, additional_files = deps_flags(ctx, ctx.attr.deps, escape = True)
+    ccinfo_copts, additional_files = deps_flags(ctx, ctx.attr.deps)
 
     include_headers = "no-clang-tidy-headers" not in ctx.attr.tags
     srcs = rule_sources(ctx.attr, include_headers)
@@ -76,8 +77,8 @@ fi
             output = ctx.outputs.executable.path,
             c_sources = " ".join([x.short_path for x in srcs if is_c_translation_unit(x, ctx.attr.tags)]),
             cxx_sources = " ".join([x.short_path for x in srcs if not is_c_translation_unit(x, ctx.attr.tags)]),
-            c_flags = " ".join([_fix_argument_path(ctx, x) for x in ccinfo_copts + c_flags]),
-            cxx_flags = " ".join([_fix_argument_path(ctx, x) for x in ccinfo_copts + cxx_flags]),
+            c_flags = " ".join([shell.quote(_fix_argument_path(ctx, x)) for x in ccinfo_copts + c_flags]),
+            cxx_flags = " ".join([shell.quote(_fix_argument_path(ctx, x)) for x in ccinfo_copts + cxx_flags]),
         ),
     )
 

@@ -125,7 +125,7 @@ def toolchain_flags(ctx, action_name = ACTION_NAMES.cpp_compile):
     )
     return flags
 
-def deps_flags(ctx, deps, *, escape):
+def deps_flags(ctx, deps):
     compilation_contexts = [dep[CcInfo].compilation_context for dep in deps]
     additional_files = depset(transitive = [
         compilation_context.headers
@@ -136,16 +136,10 @@ def deps_flags(ctx, deps, *, escape):
     for compilation_context in compilation_contexts:
         # add defines
         for define in compilation_context.defines.to_list():
-            if escape:
-                flags.append("-D'" + define + "'")
-            else:
-                flags.append("-D" + define)
+            flags.append("-D" + define)
 
         for define in compilation_context.local_defines.to_list():
-            if escape:
-                flags.append("-D'" + define + "'")
-            else:
-                flags.append("-D" + define)
+            flags.append("-D" + define)
 
         # add includes
         for i in compilation_context.framework_includes.to_list():
@@ -216,7 +210,7 @@ def _clang_tidy_aspect_impl(target, ctx):
     config = ctx.attr._clang_tidy_config.files.to_list()[0]
 
     deps = [target] + getattr(ctx.rule.attr, "implementation_deps", [])
-    rule_flags, additional_files = deps_flags(ctx, deps, escape = False)
+    rule_flags, additional_files = deps_flags(ctx, deps)
     copts = ctx.rule.attr.copts if hasattr(ctx.rule.attr, "copts") else []
     for copt in copts:
         rule_flags.append(ctx.expand_make_variables(
