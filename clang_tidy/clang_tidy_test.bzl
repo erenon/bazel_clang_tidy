@@ -73,7 +73,7 @@ fi
             clang_tidy_config = ctx.file.clang_tidy_config.short_path,
             output = ctx.outputs.executable.path,
             c_sources = " ".join([x.short_path for x in srcs if is_c_translation_unit(x, ctx.attr.tags)]),
-            cxx_sources = " ".join([x.short_path for x in srcs]),
+            cxx_sources = " ".join([x.short_path for x in srcs if not is_c_translation_unit(x, ctx.attr.tags)]),
             c_flags = " ".join([_fix_argument_path(ctx, x) for x in ccinfo_copts + c_flags]),
             cxx_flags = " ".join([_fix_argument_path(ctx, x) for x in ccinfo_copts + cxx_flags]),
         ),
