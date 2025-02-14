@@ -8,9 +8,9 @@ def _run_tidy(
         additional_deps,
         config,
         flags,
-        compilation_contexts,
         infile,
         discriminator,
+        additional_files,
         additional_inputs):
     cc_toolchain = find_cpp_toolchain(ctx)
     direct_inputs = (
@@ -23,9 +23,7 @@ def _run_tidy(
 
     inputs = depset(
         direct = direct_inputs,
-        transitive =
-            [compilation_context.headers for compilation_context in compilation_contexts] +
-            [cc_toolchain.all_files],
+        transitive = [additional_files, cc_toolchain.all_files],
     )
 
     args = ctx.actions.args()
@@ -53,42 +51,18 @@ def _run_tidy(
     # start args passed to the compiler
     args.add("--")
 
-    # add args specified by the toolchain, on the command line and rule copts
-    args.add_all(flags)
-
-    for compilation_context in compilation_contexts:
-        # add defines
-        for define in compilation_context.defines.to_list():
-            args.add("-D" + define)
-
-        for define in compilation_context.local_defines.to_list():
-            args.add("-D" + define)
-
-        # add includes
-        for i in compilation_context.framework_includes.to_list():
-            args.add("-F" + i)
-
-        for i in compilation_context.includes.to_list():
-            args.add("-I" + i)
-
-        args.add_all(compilation_context.quote_includes.to_list(), before_each = "-iquote")
-
-        args.add_all(compilation_context.system_includes.to_list(), before_each = "-isystem")
-
-        args.add_all(compilation_context.external_includes.to_list(), before_each = "-isystem")
-
     ctx.actions.run(
         inputs = inputs,
         outputs = [outfile],
         executable = wrapper,
-        arguments = [args],
+        arguments = [args] + flags,
         mnemonic = "ClangTidy",
         use_default_shell_env = True,
         progress_message = "Run clang-tidy on {}".format(infile.short_path),
     )
     return outfile
 
-def _rule_sources(ctx, include_headers):
+def rule_sources(attr, include_headers):
     header_extensions = (
         ".h",
         ".hh",
@@ -117,18 +91,18 @@ def _rule_sources(ctx, include_headers):
         return False
 
     srcs = []
-    if hasattr(ctx.rule.attr, "srcs"):
-        for src in ctx.rule.attr.srcs:
+    if hasattr(attr, "srcs"):
+        for src in attr.srcs:
             srcs += [src for src in src.files.to_list() if src.is_source and check_valid_file_type(src)]
-    if hasattr(ctx.rule.attr, "hdrs"):
-        for hdr in ctx.rule.attr.hdrs:
+    if hasattr(attr, "hdrs"):
+        for hdr in attr.hdrs:
             srcs += [hdr for hdr in hdr.files.to_list() if hdr.is_source and check_valid_file_type(hdr)]
     if include_headers:
         return srcs
     else:
         return [src for src in srcs if not src.basename.endswith(header_extensions)]
 
-def _toolchain_flags(ctx, action_name = ACTION_NAMES.cpp_compile):
+def toolchain_flags(ctx, action_name = ACTION_NAMES.cpp_compile):
     cc_toolchain = find_cpp_toolchain(ctx)
     feature_configuration = cc_common.configure_features(
         ctx = ctx,
@@ -151,7 +125,47 @@ def _toolchain_flags(ctx, action_name = ACTION_NAMES.cpp_compile):
     )
     return flags
 
-def _safe_flags(flags):
+def deps_flags(ctx, deps, *, escape):
+    compilation_contexts = [dep[CcInfo].compilation_context for dep in deps]
+    additional_files = depset(transitive = [
+        compilation_context.headers
+        for compilation_context in compilation_contexts
+    ])
+
+    flags = []
+    for compilation_context in compilation_contexts:
+        # add defines
+        for define in compilation_context.defines.to_list():
+            if escape:
+                flags.append("-D'" + define + "'")
+            else:
+                flags.append("-D" + define)
+
+        for define in compilation_context.local_defines.to_list():
+            if escape:
+                flags.append("-D'" + define + "'")
+            else:
+                flags.append("-D" + define)
+
+        # add includes
+        for i in compilation_context.framework_includes.to_list():
+            flags.append("-F" + i)
+
+        for i in compilation_context.includes.to_list():
+            flags.append("-I" + i)
+
+        for i in compilation_context.quote_includes.to_list():
+            flags.extend(["-iquote", i])
+
+        for i in compilation_context.system_includes.to_list():
+            flags.extend(["-isystem", i])
+
+        for i in compilation_context.external_includes.to_list():
+            flags.extend(["-isystem", i])
+
+    return flags, additional_files
+
+def safe_flags(flags):
     # Some flags might be used by GCC, but not understood by Clang.
     # Remove them here, to allow users to run clang-tidy, without having
     # a clang toolchain configured (that would produce a good command line with --compiler clang)
@@ -162,7 +176,7 @@ def _safe_flags(flags):
 
     return [flag for flag in flags if flag not in unsupported_flags]
 
-def _is_c_translation_unit(src, tags):
+def is_c_translation_unit(src, tags):
     """Judge if a source file is for C.
 
     Args:
@@ -201,12 +215,9 @@ def _clang_tidy_aspect_impl(target, ctx):
     additional_deps = ctx.attr._clang_tidy_additional_deps
     config = ctx.attr._clang_tidy_config.files.to_list()[0]
 
-    compilation_contexts = [target[CcInfo].compilation_context]
-    if hasattr(ctx.rule.attr, "implementation_deps"):
-        compilation_contexts.extend([implementation_dep[CcInfo].compilation_context for implementation_dep in ctx.rule.attr.implementation_deps])
-
+    deps = [target] + getattr(ctx.rule.attr, "implementation_deps", [])
+    rule_flags, additional_files = deps_flags(ctx, deps, escape = False)
     copts = ctx.rule.attr.copts if hasattr(ctx.rule.attr, "copts") else []
-    rule_flags = []
     for copt in copts:
         rule_flags.append(ctx.expand_make_variables(
             "copts",
@@ -214,11 +225,11 @@ def _clang_tidy_aspect_impl(target, ctx):
             {},
         ))
 
-    c_flags = _safe_flags(_toolchain_flags(ctx, ACTION_NAMES.c_compile) + rule_flags) + ["-xc"]
-    cxx_flags = _safe_flags(_toolchain_flags(ctx, ACTION_NAMES.cpp_compile) + rule_flags) + ["-xc++"]
+    c_flags = safe_flags(toolchain_flags(ctx, ACTION_NAMES.c_compile) + rule_flags) + ["-xc"]
+    cxx_flags = safe_flags(toolchain_flags(ctx, ACTION_NAMES.cpp_compile) + rule_flags) + ["-xc++"]
 
     include_headers = "no-clang-tidy-headers" not in ctx.rule.attr.tags
-    srcs = _rule_sources(ctx, include_headers)
+    srcs = rule_sources(ctx.rule.attr, include_headers)
 
     outputs = [
         _run_tidy(
@@ -227,10 +238,10 @@ def _clang_tidy_aspect_impl(target, ctx):
             exe,
             additional_deps,
             config,
-            c_flags if _is_c_translation_unit(src, ctx.rule.attr.tags) else cxx_flags,
-            compilation_contexts,
+            c_flags if is_c_translation_unit(src, ctx.rule.attr.tags) else cxx_flags,
             src,
             target.label.name,
+            additional_files,
             additional_inputs = getattr(ctx.rule.attr, "additional_compiler_inputs", []),
         )
         for src in srcs
