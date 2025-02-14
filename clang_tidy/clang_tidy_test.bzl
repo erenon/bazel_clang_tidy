@@ -34,12 +34,6 @@ def _clang_tidy_rule_impl(ctx):
     c_flags = safe_flags(toolchain_flags(ctx, ACTION_NAMES.c_compile) + rule_copts + rule_conlyopts) + ["-xc"]
     cxx_flags = safe_flags(toolchain_flags(ctx, ACTION_NAMES.cpp_compile) + rule_copts + rule_cxxopts) + ["-xc++"]
 
-    # TODO: Remove, patch in
-    additional_deps = ctx.attr.clang_tidy_additional_deps
-    file = additional_deps.files.to_list()[0]
-    directory = file.path.split("/include/")[0]
-    ccinfo_copts.extend(["-resource-dir", directory])
-
     ctx.actions.write(
         output = ctx.outputs.executable,
         is_executable = True,
