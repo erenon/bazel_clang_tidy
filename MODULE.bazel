@@ -1,3 +1,1 @@
 module(name = "bazel_clang_tidy")
-
-bazel_dep(name = "bazel_skylib", version = "1.7.1")
