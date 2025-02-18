@@ -1,4 +1,7 @@
-"""A test rule to run clang-tidy"""
+"""A test rule to run clang-tidy
+
+NOTE: This rule requires bash
+"""
 
 load("@bazel_tools//tools/build_defs/cc:action_names.bzl", "ACTION_NAMES")
 load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain")
