@@ -5,6 +5,7 @@ def _run_tidy(
         ctx,
         wrapper,
         exe,
+        gcc_install_dir,
         additional_deps,
         config,
         flags,
@@ -50,6 +51,12 @@ def _run_tidy(
 
     # start args passed to the compiler
     args.add("--")
+
+    if len(gcc_install_dir.files.to_list()) >= 2:
+        fail("clang_tidy_gcc_install_dir must contain at most one directory")
+
+    for dir in gcc_install_dir.files.to_list():
+        args.add("--gcc-install-dir=%s" % dir.path)
 
     ctx.actions.run(
         inputs = inputs,
@@ -206,6 +213,7 @@ def _clang_tidy_aspect_impl(target, ctx):
 
     wrapper = ctx.attr._clang_tidy_wrapper.files_to_run
     exe = ctx.attr._clang_tidy_executable
+    gcc_install_dir = ctx.attr._clang_tidy_gcc_install_dir
     additional_deps = ctx.attr._clang_tidy_additional_deps
     config = ctx.attr._clang_tidy_config.files.to_list()[0]
 
@@ -230,6 +238,7 @@ def _clang_tidy_aspect_impl(target, ctx):
             ctx,
             wrapper,
             exe,
+            gcc_install_dir,
             additional_deps,
             config,
             c_flags if is_c_translation_unit(src, ctx.rule.attr.tags) else cxx_flags,
@@ -253,6 +262,7 @@ clang_tidy_aspect = aspect(
         "_cc_toolchain": attr.label(default = Label("@bazel_tools//tools/cpp:current_cc_toolchain")),
         "_clang_tidy_wrapper": attr.label(default = Label("//clang_tidy:clang_tidy")),
         "_clang_tidy_executable": attr.label(default = Label("//:clang_tidy_executable")),
+        "_clang_tidy_gcc_install_dir": attr.label(default = Label("//:clang_tidy_gcc_install_dir")),
         "_clang_tidy_additional_deps": attr.label(default = Label("//:clang_tidy_additional_deps")),
         "_clang_tidy_config": attr.label(default = Label("//:clang_tidy_config")),
     },
