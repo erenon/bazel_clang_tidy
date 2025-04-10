@@ -33,3 +33,14 @@ label_flag(
     build_setting_default = ":clang_tidy_additional_deps_default",
     visibility = ["//visibility:public"],
 )
+
+filegroup(
+    name = "clang_tidy_gcc_install_dir_default",
+    srcs = [],
+)
+
+label_flag(
+    name = "clang_tidy_gcc_install_dir",
+    build_setting_default = ":clang_tidy_gcc_install_dir_default",
+    visibility = ["//visibility:public"],
+)
