@@ -6,6 +6,7 @@ def _run_tidy(
         wrapper,
         exe,
         gcc_install_dir,
+        resource_dir,
         additional_deps,
         config,
         flags,
@@ -24,7 +25,7 @@ def _run_tidy(
 
     inputs = depset(
         direct = direct_inputs,
-        transitive = [additional_files, cc_toolchain.all_files],
+        transitive = [additional_files, cc_toolchain.all_files, resource_dir.files],
     )
 
     args = ctx.actions.args()
@@ -57,6 +58,11 @@ def _run_tidy(
 
     for dir in gcc_install_dir.files.to_list():
         args.add("--gcc-install-dir=%s" % dir.path)
+
+    resource_dir_files = resource_dir.files.to_list()
+    if resource_dir_files:
+        directory = resource_dir_files[0].path.split("/include/")[0]
+        args.add("-resource-dir", directory)
 
     ctx.actions.run(
         inputs = inputs,
@@ -214,6 +220,7 @@ def _clang_tidy_aspect_impl(target, ctx):
     wrapper = ctx.attr._clang_tidy_wrapper.files_to_run
     exe = ctx.attr._clang_tidy_executable
     gcc_install_dir = ctx.attr._clang_tidy_gcc_install_dir
+    resource_dir = ctx.attr._clang_tidy_resource_dir
     additional_deps = ctx.attr._clang_tidy_additional_deps
     config = ctx.attr._clang_tidy_config.files.to_list()[0]
 
@@ -239,6 +246,7 @@ def _clang_tidy_aspect_impl(target, ctx):
             wrapper,
             exe,
             gcc_install_dir,
+            resource_dir,
             additional_deps,
             config,
             c_flags if is_c_translation_unit(src, ctx.rule.attr.tags) else cxx_flags,
@@ -263,6 +271,7 @@ clang_tidy_aspect = aspect(
         "_clang_tidy_wrapper": attr.label(default = Label("//clang_tidy:clang_tidy")),
         "_clang_tidy_executable": attr.label(default = Label("//:clang_tidy_executable")),
         "_clang_tidy_gcc_install_dir": attr.label(default = Label("//:clang_tidy_gcc_install_dir")),
+        "_clang_tidy_resource_dir": attr.label(default = Label("//:clang_tidy_resource_dir")),
         "_clang_tidy_additional_deps": attr.label(default = Label("//:clang_tidy_additional_deps")),
         "_clang_tidy_config": attr.label(default = Label("//:clang_tidy_config")),
     },
