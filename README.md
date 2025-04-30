@@ -118,6 +118,28 @@ build:clang-tidy --@bazel_clang_tidy//:clang_tidy_gcc_install_dir=@gcc-linux-x86
 build:clang-tidy --@bazel_clang_tidy//:clang_tidy_additional_deps=@gcc-linux-x86_64//:toolchain_root
 ```
 
+### use with a vendored clang-tidy
+
+In the case you vendor clang-tidy, potentially alongside clang itself,
+it's possible clang-tidy cannot automatically find the `-resource-dir`
+path to the builtin headers. In this case, you can use skylib's
+`directory` rule to create a target to the clang resource directory.
+
+```bzl
+load("@bazel_skylib//rules/directory:directory.bzl", "directory")
+
+directory(
+    name = "resource_dir",
+    srcs = glob(["lib/clang/*/include/**"]),
+    visibility = ["//visibility:public"],
+)
+```
+
+Then pass the `resource_dir` with a flag in your `.bazelrc`:
+
+```
+build:clang-tidy --@bazel_clang_tidy//:clang_tidy_resource_dir=//path/to:resource_dir
+```
 
 ## Features
 

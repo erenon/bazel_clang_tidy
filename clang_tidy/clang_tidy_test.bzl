@@ -40,6 +40,11 @@ def _clang_tidy_rule_impl(ctx):
     rule_conlyopts = _get_copts_attr(ctx, "conlyopts")
     rule_cxxopts = _get_copts_attr(ctx, "cxxopts")
 
+    files = ctx.attr.clang_tidy_resource_dir.files.to_list()
+    if files:
+        directory = files[0].path.split("/include/")[0]
+        ccinfo_copts.extend(["-resource-dir", directory])
+
     c_flags = safe_flags(toolchain_flags(ctx, ACTION_NAMES.c_compile) + rule_copts + rule_conlyopts) + ["-xc"]
     cxx_flags = safe_flags(toolchain_flags(ctx, ACTION_NAMES.cpp_compile) + rule_copts + rule_cxxopts) + ["-xc++"]
 
@@ -95,7 +100,12 @@ fi
                 ctx.files.srcs + ctx.files.hdrs + ctx.files.data,
                 transitive_files = depset(
                     [ctx.file.clang_tidy_config],
-                    transitive = [additional_files, find_cpp_toolchain(ctx).all_files, ctx.attr.clang_tidy_additional_deps.files],
+                    transitive = [
+                        additional_files,
+                        find_cpp_toolchain(ctx).all_files,
+                        ctx.attr.clang_tidy_additional_deps.files,
+                        ctx.attr.clang_tidy_resource_dir.files,
+                    ],
                 ),
             )
                 .merge(clang_tidy[DefaultInfo].default_runfiles),
@@ -110,6 +120,7 @@ clang_tidy_test = rule(
         "deps": attr.label_list(providers = [CcInfo]),
         "clang_tidy_executable": attr.label(default = Label("//:clang_tidy_executable")),
         "clang_tidy_additional_deps": attr.label(default = Label("//:clang_tidy_additional_deps")),
+        "clang_tidy_resource_dir": attr.label(default = Label("//:clang_tidy_resource_dir")),
         "clang_tidy_config": attr.label(
             default = Label("//:clang_tidy_config"),
             allow_single_file = True,
