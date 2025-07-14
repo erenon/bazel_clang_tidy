@@ -67,14 +67,16 @@ fi
 
 ln -s .. external
 
+"$bin" --quiet --verify-config
+
 has_srcs=false
 if [[ -n "{c_sources}" ]]; then
-  "$bin" --quiet --verify-config --export-fixes $TEST_UNDECLARED_OUTPUTS_DIR/cfixes.yaml {c_sources} -- {c_flags}
+  "$bin" --quiet --export-fixes $TEST_UNDECLARED_OUTPUTS_DIR/cfixes.yaml {c_sources} -- {c_flags}
   has_srcs=true
 fi
 
 if [[ -n "{cxx_sources}" ]]; then
-  "$bin" --quiet --verify-config --export-fixes $TEST_UNDECLARED_OUTPUTS_DIR/cxxfixes.yaml {cxx_sources} -- {cxx_flags}
+  "$bin" --quiet --export-fixes $TEST_UNDECLARED_OUTPUTS_DIR/cxxfixes.yaml {cxx_sources} -- {cxx_flags}
   has_srcs=true
 fi
 
