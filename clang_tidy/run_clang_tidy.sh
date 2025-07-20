@@ -33,9 +33,11 @@ trap 'if (($?)); then cat "$logfile" 1>&2; fi; rm "$logfile"' EXIT
 # re-promoted to an error. See the clang-tidy bug here for details:
 # https://github.com/llvm/llvm-project/issues/61969
 set -- \
-  --verify-config \
   --checks=-clang-diagnostic-builtin-macro-redefined \
   --warnings-as-errors=-clang-diagnostic-builtin-macro-redefined \
    "$@"
 
-"${CLANG_TIDY_BIN}" "$@" >"$logfile" 2>&1
+{
+  "${CLANG_TIDY_BIN}" --quiet --verify-config \
+  && "${CLANG_TIDY_BIN}" "$@"
+} >"$logfile" 2>&1
