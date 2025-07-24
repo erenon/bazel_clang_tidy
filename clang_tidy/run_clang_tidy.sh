@@ -17,10 +17,6 @@ shift
 touch $OUTPUT
 truncate -s 0 $OUTPUT
 
-# if $CONFIG is provided by some external workspace, we need to
-# place it in the current directory
-test -e .clang-tidy || ln -s -f $CONFIG .clang-tidy
-
 # Print output on failure only
 logfile="$(mktemp)"
 trap 'if (($?)); then cat "$logfile" 1>&2; fi; rm "$logfile"' EXIT
@@ -38,6 +34,6 @@ set -- \
    "$@"
 
 {
-  "${CLANG_TIDY_BIN}" --quiet --verify-config \
-  && "${CLANG_TIDY_BIN}" "$@"
+  "${CLANG_TIDY_BIN}" --config-file=$CONFIG --quiet --verify-config &&
+  "${CLANG_TIDY_BIN}" --config-file=$CONFIG "$@"
 } >"$logfile" 2>&1
