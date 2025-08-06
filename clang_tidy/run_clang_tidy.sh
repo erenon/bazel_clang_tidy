@@ -34,6 +34,6 @@ set -- \
    "$@"
 
 {
-  "${CLANG_TIDY_BIN}" --config-file=$CONFIG --quiet --verify-config &&
-  "${CLANG_TIDY_BIN}" --config-file=$CONFIG "$@"
-} >"$logfile" 2>&1
+  "${CLANG_TIDY_BIN}" --config-file=$CONFIG --quiet --verify-config >"$logfile" 2>&1 &&
+  "${CLANG_TIDY_BIN}" --config-file=$CONFIG "$@" >"$logfile" 2>&1
+}
