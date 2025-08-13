@@ -4,7 +4,6 @@ NOTE: This rule requires bash
 """
 
 load("@bazel_tools//tools/build_defs/cc:action_names.bzl", "ACTION_NAMES")
-load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain")
 load(":clang_tidy.bzl", "deps_flags", "is_c_translation_unit", "rule_sources", "safe_flags", "toolchain_flags")
 
 def _quote(s):
@@ -45,8 +44,9 @@ def _clang_tidy_rule_impl(ctx):
         directory = files[0].path.split("/include/")[0]
         ccinfo_copts.extend(["-resource-dir", directory])
 
-    c_flags = safe_flags(toolchain_flags(ctx, ACTION_NAMES.c_compile) + rule_copts + rule_conlyopts) + ["-xc"]
-    cxx_flags = safe_flags(toolchain_flags(ctx, ACTION_NAMES.cpp_compile) + rule_copts + rule_cxxopts) + ["-xc++"]
+    cc_toolchain = ctx.exec_groups["test"].toolchains["@bazel_tools//tools/cpp:toolchain_type"].cc
+    c_flags = safe_flags(toolchain_flags(ctx, cc_toolchain, ACTION_NAMES.c_compile) + rule_copts + rule_conlyopts) + ["-xc"]
+    cxx_flags = safe_flags(toolchain_flags(ctx, cc_toolchain, ACTION_NAMES.cpp_compile) + rule_copts + rule_cxxopts) + ["-xc++"]
 
     ctx.actions.write(
         output = ctx.outputs.executable,
@@ -104,7 +104,7 @@ fi
                     [ctx.file.clang_tidy_config],
                     transitive = [
                         additional_files,
-                        find_cpp_toolchain(ctx).all_files,
+                        cc_toolchain.all_files,
                         ctx.attr.clang_tidy_additional_deps.files,
                         ctx.attr.clang_tidy_resource_dir.files,
                     ],
@@ -120,9 +120,18 @@ clang_tidy_test = rule(
     fragments = ["cpp"],
     attrs = {
         "deps": attr.label_list(providers = [CcInfo]),
-        "clang_tidy_executable": attr.label(default = Label("//:clang_tidy_executable")),
-        "clang_tidy_additional_deps": attr.label(default = Label("//:clang_tidy_additional_deps")),
-        "clang_tidy_resource_dir": attr.label(default = Label("//:clang_tidy_resource_dir")),
+        "clang_tidy_executable": attr.label(
+            default = Label("//:clang_tidy_executable"),
+            cfg = config.exec("test"),
+        ),
+        "clang_tidy_additional_deps": attr.label(
+            default = Label("//:clang_tidy_additional_deps"),
+            cfg = config.exec("test"),
+        ),
+        "clang_tidy_resource_dir": attr.label(
+            default = Label("//:clang_tidy_resource_dir"),
+            cfg = config.exec("test"),
+        ),
         "clang_tidy_config": attr.label(
             default = Label("//:clang_tidy_config"),
             allow_single_file = True,
@@ -134,5 +143,11 @@ clang_tidy_test = rule(
         "conlyopts": attr.string_list(),
         "cxxopts": attr.string_list(),
     },
-    toolchains = ["@bazel_tools//tools/cpp:toolchain_type"],
+    exec_groups = {
+        "test": exec_group(
+            toolchains = [
+                "@bazel_tools//tools/cpp:toolchain_type",
+            ],
+        ),
+    },
 )

@@ -3,6 +3,7 @@ load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain")
 
 def _run_tidy(
         ctx,
+        cc_toolchain,
         wrapper,
         exe,
         gcc_install_dir,
@@ -14,7 +15,6 @@ def _run_tidy(
         discriminator,
         additional_files,
         additional_inputs):
-    cc_toolchain = find_cpp_toolchain(ctx)
     direct_inputs = (
         [infile, config] +
         additional_deps.files.to_list() +
@@ -115,8 +115,7 @@ def rule_sources(attr, include_headers):
     else:
         return [src for src in srcs if not src.basename.endswith(header_extensions)]
 
-def toolchain_flags(ctx, action_name = ACTION_NAMES.cpp_compile):
-    cc_toolchain = find_cpp_toolchain(ctx)
+def toolchain_flags(ctx, cc_toolchain, action_name = ACTION_NAMES.cpp_compile):
     feature_configuration = cc_common.configure_features(
         ctx = ctx,
         cc_toolchain = cc_toolchain,
@@ -234,8 +233,9 @@ def _clang_tidy_aspect_impl(target, ctx):
             {},
         ))
 
-    c_flags = safe_flags(toolchain_flags(ctx, ACTION_NAMES.c_compile) + rule_flags) + ["-xc"]
-    cxx_flags = safe_flags(toolchain_flags(ctx, ACTION_NAMES.cpp_compile) + rule_flags) + ["-xc++"]
+    cc_toolchain = find_cpp_toolchain(ctx)
+    c_flags = safe_flags(toolchain_flags(ctx, cc_toolchain, ACTION_NAMES.c_compile) + rule_flags) + ["-xc"]
+    cxx_flags = safe_flags(toolchain_flags(ctx, cc_toolchain, ACTION_NAMES.cpp_compile) + rule_flags) + ["-xc++"]
 
     include_headers = "no-clang-tidy-headers" not in ctx.rule.attr.tags
     srcs = rule_sources(ctx.rule.attr, include_headers)
@@ -243,6 +243,7 @@ def _clang_tidy_aspect_impl(target, ctx):
     outputs = [
         _run_tidy(
             ctx,
+            cc_toolchain,
             wrapper,
             exe,
             gcc_install_dir,
