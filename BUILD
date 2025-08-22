@@ -1,3 +1,11 @@
+load("@bazel_skylib//rules:common_settings.bzl", "bool_flag")
+
+bool_flag(
+    name = "run_on_headers",
+    build_setting_default = True,
+    visibility = ["//visibility:public"],
+)
+
 filegroup(
     name = "clang_tidy_config_default",
     srcs = [
