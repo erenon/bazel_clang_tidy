@@ -1,1 +1,3 @@
 module(name = "bazel_clang_tidy")
+
+bazel_dep(name = "rules_shell", version = "0.6.1")
