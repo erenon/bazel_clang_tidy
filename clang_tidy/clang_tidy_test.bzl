@@ -95,6 +95,7 @@ fi
         ),
     )
 
+    compiler_files = getattr(cc_toolchain, 'compiler_files', cc_toolchain.all_files)
     return [
         DefaultInfo(
             executable = ctx.outputs.executable,
@@ -104,7 +105,7 @@ fi
                     [ctx.file.clang_tidy_config],
                     transitive = [
                         additional_files,
-                        cc_toolchain.all_files,
+                        compiler_files,
                         ctx.attr.clang_tidy_additional_deps.files,
                         ctx.attr.clang_tidy_resource_dir.files,
                     ],

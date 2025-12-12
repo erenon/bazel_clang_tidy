@@ -2,3 +2,8 @@ build:clang-tidy --aspects @bazel_clang_tidy//clang_tidy:clang_tidy.bzl%clang_ti
 build:clang-tidy --output_groups=report
 
 build --test_output=errors
+
+test:integration --@bazel_clang_tidy//:clang_tidy_executable=@llvm_toolchain//:clang-tidy
+test:integration --@bazel_clang_tidy//:clang_tidy_resource_dir=@llvm_toolchain_llvm//:include
+test:integration --@bazel_clang_tidy//:clang_tidy_resource_dir=//tools/llvm:clang_resource_dir
+test:integration --extra_toolchains=@llvm_toolchain//:cc-toolchain-x86_64-linux

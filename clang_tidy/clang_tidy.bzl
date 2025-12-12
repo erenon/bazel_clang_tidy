@@ -23,9 +23,10 @@ def _run_tidy(
     for additional_input in additional_inputs:
         direct_inputs.extend(additional_input.files.to_list())
 
+    compiler_files = getattr(cc_toolchain, 'compiler_files', cc_toolchain.all_files)
     inputs = depset(
         direct = direct_inputs,
-        transitive = [additional_files, cc_toolchain.all_files, resource_dir.files],
+        transitive = [additional_files, compiler_files, resource_dir.files],
     )
 
     args = ctx.actions.args()
