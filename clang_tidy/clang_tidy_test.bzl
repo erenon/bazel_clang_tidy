@@ -57,9 +57,8 @@ def _clang_tidy_rule_impl(ctx):
 set -euo pipefail
 
 readonly bin="{clang_tidy_bin}"
-readonly config="{clang_tidy_config}"
 
-test -e .clang-tidy || ln -s -f \\$config .clang-tidy
+test -e .clang-tidy || ln -s -f "{clang_tidy_config}" .clang-tidy
 if [[ ! -f .clang-tidy ]]; then
   echo "error: failed to setup config" >&2
   exit 1
