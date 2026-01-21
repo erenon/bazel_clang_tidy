@@ -1,3 +1,4 @@
 module(name = "bazel_clang_tidy")
 
+bazel_dep(name = "rules_cc", version = "0.2.16")
 bazel_dep(name = "rules_shell", version = "0.6.1")
