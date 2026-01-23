@@ -173,6 +173,25 @@ def deps_flags(ctx, deps):
 
     return flags, additional_files
 
+def builtin_include_flags(cc_toolchain):
+    """Get flags for the toolchain's builtin include directories.
+
+    These are the C/C++ standard library paths that the compiler knows about implicitly.
+    clang-tidy needs them explicitly when cross-compiling since it may not know the
+    target's standard library layout.
+
+    Args:
+        cc_toolchain: The C++ toolchain provider.
+
+    Returns:
+        list[str]: Compiler flags for the builtin include directories.
+    """
+    flags = []
+    for built_in_include_dir in cc_toolchain.built_in_include_directories:
+        flags.extend(["-isystem", built_in_include_dir])
+    return flags
+
+
 def safe_flags(flags):
     # Some flags might be used by GCC, but not understood by Clang.
     # Remove them here, to allow users to run clang-tidy, without having
@@ -238,6 +257,7 @@ def _clang_tidy_aspect_impl(target, ctx):
     cc_toolchain = find_cpp_toolchain(ctx)
     c_flags = safe_flags(toolchain_flags(ctx, cc_toolchain, ACTION_NAMES.c_compile) + rule_flags) + ["-xc"]
     cxx_flags = safe_flags(toolchain_flags(ctx, cc_toolchain, ACTION_NAMES.cpp_compile) + rule_flags) + ["-xc++"]
+    builtin_flags = builtin_include_flags(cc_toolchain)
 
     include_headers = "no-clang-tidy-headers" not in ctx.rule.attr.tags
     srcs = rule_sources(ctx.rule.attr, include_headers)
@@ -252,7 +272,7 @@ def _clang_tidy_aspect_impl(target, ctx):
             resource_dir,
             additional_deps,
             config,
-            c_flags if is_c_translation_unit(src, ctx.rule.attr.tags) else cxx_flags,
+            (c_flags if is_c_translation_unit(src, ctx.rule.attr.tags) else cxx_flags) + builtin_flags,
             src,
             target.label.name,
             additional_files,
