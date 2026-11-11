@@ -17,11 +17,7 @@ def _run_tidy(
         discriminator,
         additional_files,
         additional_inputs):
-    direct_inputs = (
-        [infile, config] +
-        additional_deps.files.to_list() +
-        ([exe.files_to_run.executable] if exe.files_to_run.executable else [])
-    )
+    direct_inputs = [infile, config] + additional_deps.files.to_list()
     for additional_input in additional_inputs:
         direct_inputs.extend(additional_input.files.to_list())
 
@@ -70,6 +66,7 @@ def _run_tidy(
         inputs = inputs,
         outputs = [outfile],
         executable = wrapper,
+        tools = [exe.files_to_run],
         arguments = [args] + flags,
         mnemonic = "ClangTidy",
         use_default_shell_env = True,
